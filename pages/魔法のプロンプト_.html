@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🤖QCC｜魔法のプロンプト♪</title>
+
+  <style>
+    :root{
+      --bg:#eef1f7; --card:#ffffff; --ink:#1a2233; --muted:#5a6a88; --brand:#1a7fd4; --accent:#40a8f0; --bd:#a0c8f0;
+      --gradient:linear-gradient(135deg,#e0f2fe,#38bdf8,#0284c7,#1e3a8a);
+    }
+    html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',Meiryo,sans-serif;line-height:1.75}
+    .shell{max-width:1080px;margin:24px auto;padding:0 16px}
+
+    /* ── アプリバー ── */
+    .appbar{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 14px;box-shadow:0 8px 30px rgba(37,99,235,.10);position:sticky;top:10px;z-index:10}
+    .appbar .row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand .ttl{font-size:1.2rem;font-weight:750;letter-spacing:.02em;background:var(--gradient);color:#fff;padding:4px 12px;border-radius:10px;}
+
+    /* ── レイアウト ── */
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.nav{margin-bottom:16px;position:relative;top:0}}
+
+    /* ── サイドナビ ── */
+    .nav{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .nav h3{font-size:.95rem;margin:.25rem 0 .5rem;color:#1a7fd4;font-weight:700}
+    .nav a{display:block;padding:10px 12px;margin:6px 0;color:var(--ink);text-decoration:none;border-radius:10px;font-weight:500}
+    .nav a:hover{background:#eff8ff;border:1px dashed #a0c8f0;color:#1a7fd4}
+
+    /* ── メインページ ── */
+    .page{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;box-shadow:0 16px 40px rgba(26,127,212,.12)}
+    .wrap{max-width:720px}
+    h1{font-size:1.75rem;margin:.2rem 0 .6rem;color:#1a7fd4;font-weight:800}
+    h2{font-size:1.2rem;margin:1.6rem 0 .45rem;color:#1a7fd4;font-weight:700}
+
+    /* ── 共通ユーティリティ ── */
+    .emoji-list{padding:0;list-style:none}
+    .emoji-list li{position:relative;padding-left:1.6em;margin:.4rem 0}
+    .emoji-list li::before{content:attr(data-emoji);position:absolute;left:0;color:#1a7fd4;font-size:.9em;line-height:2;}
+    .back-home{display:inline-flex;align-items:center;gap:.5em;background:#eff8ff;color:#1a7fd4;border:1.5px solid #40a8f0;padding:8px 12px;border-radius:10px;font-weight:700;text-decoration:none}
+    .back-home:hover{background:#dbeeff}
+    .footer{color:var(--muted);font-size:.92rem;margin-top:20px;text-align:center}
+    .copyright-pill{display:block;margin-top:8px;background:#eff8ff;border:2px solid #40a8f0;color:#1a7fd4;font-weight:800;border-radius:999px;padding:6px 16px;font-size:.9rem;text-align:center;}
+
+    /* ── ヒントボックス ── */
+    .hint-box{background:linear-gradient(135deg,#eff8ff,#dbeeff);border:2px solid #40a8f0;border-radius:12px;padding:14px 18px;margin:12px 0 16px;}
+    .hint-box .hint-title{color:#1a7fd4;font-weight:800;font-size:.97rem;margin-bottom:6px}
+
+    /* ── 注意ボックス ── */
+    .caution-box{background:#fffbeb;border:2px solid #fbbf24;border-radius:12px;padding:14px 18px;margin:10px 0}
+    .caution-box .caution-title{color:#b45309;font-weight:800;font-size:1rem;margin-bottom:6px}
+
+    /* ── セクション区切り ── */
+    .section-label{display:inline-flex;align-items:center;gap:8px;background:var(--gradient);color:#fff;font-weight:800;font-size:.95rem;border-radius:999px;padding:5px 16px;margin:18px 0 10px;}
+
+    /* ── ステップリスト ── */
+    .step-list{list-style:none;padding:0;margin:12px 0 0;counter-reset:steps}
+    .step-list li{counter-increment:steps;display:flex;align-items:flex-start;gap:12px;padding:12px 14px;margin-bottom:10px;background:#f7fbff;border:1px solid #b6d9f5;border-radius:12px;}
+    .step-list li::before{content:counter(steps);min-width:28px;height:28px;border-radius:50%;background:var(--gradient);color:#fff;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+    .step-list li .step-body{flex:1}
+    .step-list li .step-title{font-weight:700;color:#0284c7;margin-bottom:3px}
+    .step-list li .step-desc{font-size:.93rem;color:#344;line-height:1.65}
+    .step-list li .step-hint{display:inline-block;margin-top:5px;background:#eff8ff;border:1px dashed #40a8f0;color:#1a7fd4;font-size:.82rem;border-radius:8px;padding:3px 9px}
+
+    /* ── 魔法のプロンプト枠（ページ中核） ── */
+    .magic-box{background:linear-gradient(135deg,#fdf4ff,#ede9fe,#dbeafe);border:3px solid #a78bfa;border-radius:16px;padding:20px 22px;margin:16px 0 20px;}
+    .magic-box .magic-title{display:flex;align-items:center;gap:8px;font-weight:900;font-size:1.1rem;color:#7c3aed;margin-bottom:10px;}
+    .magic-box .magic-desc{font-size:.93rem;color:#4c1d95;margin-bottom:12px;line-height:1.7;}
+    .magic-template{background:#fff;border:2px dashed #a78bfa;border-radius:12px;padding:14px 16px;font-size:.93rem;color:#1a2233;white-space:pre-wrap;line-height:1.9;position:relative;}
+    .magic-template .req-highlight{color:#d97706;font-weight:800;background:#fef3c7;border-radius:4px;padding:0 3px;}
+    .magic-copy-btn{margin-top:10px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;border:none;border-radius:9px;padding:7px 18px;font-size:.88rem;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;}
+    .magic-copy-btn:hover{opacity:.85;}
+
+    /* ── 職種カード ── */
+    .job-card{background:#f7fbff;border:1.5px solid #b6d9f5;border-radius:14px;padding:18px 20px;margin-bottom:18px;position:relative;}
+    .job-card .job-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+    .job-card .job-icon{font-size:1.6rem;}
+    .job-card .job-title{font-weight:800;color:#0284c7;font-size:1.05rem;}
+    .job-card .job-badge{font-size:.8rem;color:#5a6a88;background:#eff8ff;border:1px dashed #40a8f0;border-radius:8px;padding:2px 8px;white-space:nowrap;}
+
+    /* ── リクエスト例リスト ── */
+    .req-list{list-style:none;padding:0;margin:0 0 12px;}
+    .req-list li{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;margin-bottom:7px;background:#fff;border:1px solid #b6d9f5;border-radius:10px;font-size:.91rem;cursor:pointer;transition:.15s;}
+    .req-list li:hover{background:#eff8ff;border-color:#40a8f0;}
+    .req-list li .req-num{min-width:22px;height:22px;border-radius:50%;background:var(--gradient);color:#fff;font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+    .req-list li .req-text{flex:1;color:#1a2233;line-height:1.55;}
+    .req-list li .req-copy{margin-left:auto;background:var(--gradient);color:#fff;border:none;border-radius:7px;padding:3px 10px;font-size:.77rem;font-weight:700;cursor:pointer;flex-shrink:0;white-space:nowrap;}
+    .req-list li .req-copy:hover{opacity:.8;}
+
+    /* ── 組み立て済みプロンプト（展開表示） ── */
+    .assembled-prompt{display:none;background:#fdf4ff;border:2px dashed #a78bfa;border-radius:10px;padding:12px 14px;font-size:.88rem;color:#1a2233;white-space:pre-wrap;line-height:1.8;margin-top:6px;}
+    .assembled-prompt.show{display:block;}
+    .show-btn{background:none;border:1.5px dashed #a78bfa;color:#7c3aed;border-radius:8px;padding:4px 12px;font-size:.8rem;font-weight:700;cursor:pointer;margin-top:4px;}
+    .show-btn:hover{background:#ede9fe;}
+
+    /* ── アコーディオン的な仕切り ── */
+    .divider-soft{border:none;border-top:1.5px dashed #b6d9f5;margin:14px 0;}
+
+    /* ── ポイント説明 ── */
+    .point-row{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#f7fbff;border-left:4px solid #40a8f0;border-radius:0 10px 10px 0;margin-bottom:8px;font-size:.91rem;}
+    .point-row .pt-icon{font-size:1.1rem;flex-shrink:0;}
+    .point-row .pt-text{color:#1a2233;line-height:1.6;}
+    .point-row .pt-text strong{color:#0284c7;}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── アプリバー ── -->
+  <div class="appbar" role="banner">
+    <div class="row">
+      <div class="brand">
+        <div class="ttl">🤖 AI‑Driven Quality. Powered by Oz. 🧩</div>
+      </div>
+      <div class="brand" style="gap:10px;">
+        <div style="font-size:.9rem;color:#4a4a4a;font-weight:600;">🌱 AIでできる事を広げよう！ ✨</div>
+        <a class="back-home" href="../index.html" aria-label="トップページに戻る">➡ 🏠</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ── サイドナビ ── -->
+    <nav class="nav" aria-label="ページ内メニュー">
+      <h3>📋 目次</h3>
+      <a href="#howto">✨ 魔法の使い方</a>
+      <a href="#magic-prompt">📋 魔法のプロンプト</a>
+      <a href="#sales">💼 営業</a>
+      <a href="#it">💻 情シス</a>
+      <a href="#accounting">🧾 経理</a>
+      <a href="#hr">👥 人事・採用・給与</a>
+      <a href="#training">📚 研修</a>
+      <a href="#purchase">📦 購買</a>
+      <a href="#general">🏢 総務</a>
+      <a href="#legal">⚖️ 法務</a>
+      <a href="#caution">⚠️ 注意事項</a>
+      <a class="back-home" href="index.html" style="margin-top:10px;">🏠 トップページに戻る</a>
+    </nav>
+
+    <!-- ── メインコンテンツ ── -->
+    <main class="page">
+      <div class="wrap">
+
+        <div style="margin-bottom:.4rem;">
+          <h1 style="margin:0;">魔法のプロンプト♪<br>AIにプロンプトを聞いてしまおう！🪄</h1>
+          <p style="font-size:.95rem;color:#5a6a88;margin:.4rem 0 0;">職種別 実践ガイド｜「どう質問すればいい？」に答えます</p>
+        </div>
+
+        <div class="hint-box" style="margin-top:14px;">
+          <div class="hint-title">🐣 このページでわかること</div>
+          <ul class="emoji-list">
+            <li data-emoji="✅">「プロンプトがうまく書けない…」を一発で解決する方法</li>
+            <li data-emoji="✅">コピーするだけで使える「魔法のプロンプト」</li>
+            <li data-emoji="✅">営業・情シス・経理など職種ごとの具体的なリクエスト例</li>
+            <li data-emoji="✅">そのまま送れる、組み立て済みプロンプトのサンプル</li>
+          </ul>
+        </div>
+
+        <!-- ① 魔法の使い方 -->
+        <section id="howto">
+          <div class="section-label">✨ 魔法の使い方</div>
+
+          <p style="font-size:.95rem;">
+            プロンプトの書き方に悩んだら、<strong>「プロンプトのお手本を作ってください」とAI自身に聞いてしまいましょう！</strong><br>
+            下の「魔法のプロンプト」に、自分がやりたいことを書き込んでコピーするだけでOKです🎉
+          </p>
+
+          <div class="point-row"><span class="pt-icon">🤔</span><span class="pt-text"><strong>悩み：</strong>「メール書いて」と送っても的外れな回答しか返ってこない…</span></div>
+          <div class="point-row"><span class="pt-icon">💡</span><span class="pt-text"><strong>解決策：</strong>AIに「この目的に合う最高のプロンプトを作って！」と先に聞いてしまう</span></div>
+          <div class="point-row"><span class="pt-icon">🌟</span><span class="pt-text"><strong>効果：</strong>AIが「こう聞けばいいよ」と教えてくれるので、そのまま使えるプロンプトが手に入る！</span></div>
+
+          <ol class="step-list">
+            <li>
+              <div class="step-body">
+                <div class="step-title">下の「魔法のプロンプト」の【リクエスト】部分を自分のやりたいことに書き換える</div>
+                <div class="step-desc">例：「提案メールを書きたい」「経費精算の案内文を作りたい」など、普通の言葉でOKです！</div>
+                <div class="step-hint">🔑 難しく考えなくてOK。普段の言葉でそのまま書いてください</div>
+              </div>
+            </li>
+            <li>
+              <div class="step-body">
+                <div class="step-title">「📋 コピー」ボタンを押して、claude.ai のチャット欄に貼り付けて送信</div>
+                <div class="step-desc">AIが「こういうプロンプトを使うといいですよ」と、使えるプロンプトを提案してくれます。</div>
+                <div class="step-hint">🔗 <a href="https://claude.ai" target="_blank" style="color:#1a7fd4;font-weight:700;">https://claude.ai</a> を開こう</div>
+              </div>
+            </li>
+            <li>
+              <div class="step-body">
+                <div class="step-title">AIが提案してくれたプロンプトを使って、改めて質問する</div>
+                <div class="step-desc">AIが作ってくれたプロンプトをそのままコピーして、新しいチャットで使ってみましょう！</div>
+                <div class="step-hint">🎉 これで完璧なプロンプトが使えます！</div>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <!-- ② 魔法のプロンプト -->
+        <section id="magic-prompt">
+          <div class="section-label">🪄 魔法のプロンプト（コピーして使おう！）</div>
+
+          <div class="magic-box">
+            <div class="magic-title">🪄 これが「魔法のプロンプト」です！</div>
+            <div class="magic-desc">
+              オレンジ色の <strong style="color:#d97706;">【リクエスト】〜</strong> の部分を、あなたがやりたいことに書き換えてください。<br>
+              それ以外の部分はそのままでOKです！✨
+            </div>
+            <div class="magic-template" id="magic-main"><span class="req-highlight">【リクエスト】
+ここに、あなたがやりたいことを普通の言葉で書いてください。
+例：「取引先へのお礼メールを書きたい」「経費精算の案内を全社員に送りたい」など</span>
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+            <button class="magic-copy-btn" onclick="copyById('magic-main',this)">📋 魔法のプロンプトをコピー</button>
+          </div>
+
+          <div class="hint-box">
+            <div class="hint-title">💡 【リクエスト】の書き方のコツ</div>
+            <ul class="emoji-list">
+              <li data-emoji="✅">難しく書かなくてOK！普段の言葉でそのまま書いてください</li>
+              <li data-emoji="✅">「〜したい」「〜を作りたい」「〜を知りたい」のような形で書くとGood🌟</li>
+              <li data-emoji="✅">職種・立場を添えるとより精度が上がります（例：「経理担当として…」）</li>
+              <li data-emoji="✅">1〜3文程度で十分です。長く書きすぎなくてOK！</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ③ 営業 -->
+        <section id="sales">
+          <div class="section-label">💼 営業</div>
+          <p style="font-size:.93rem;color:#5a6a88;margin-bottom:8px;">
+            「こんなことに使いたい」というリクエスト例を参考に、魔法のプロンプトに書き込んでみましょう！<br>
+            「▶ 組み立て済みを見る」ボタンで、実際にAIに送るプロンプトのサンプルも確認できます。
+          </p>
+
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">💼</span>
+              <span class="job-title">営業担当者が悩みやすいシーン</span>
+              <span class="job-badge">リクエスト例 4つ</span>
+            </div>
+            <ul class="req-list">
+
+              <li>
+                <span class="req-num">1</span>
+                <span class="req-text">
+                  <strong>新規開拓メールを書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">初めてのお客様に、自社製品のことを知ってもらえる丁寧な紹介メールを書きたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'sales-req1')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="sales-req1">【リクエスト】
+営業担当として、初めてアプローチする見込み顧客（中小企業の総務担当者）に向けて、自社のサービス（業務効率化ツール）を紹介する新規開拓メールを書きたい。押しつけがましくなく、読んでもらえるメールにしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'sales-req1')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">2</span>
+                <span class="req-text">
+                  <strong>商談後のフォローメールを書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">打ち合わせのお礼と、提案内容のまとめ・次のアクションを伝えるメールを書きたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'sales-req2')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="sales-req2">【リクエスト】
+先日お客様と商談を行った後、お礼と提案内容のポイント整理、次回の日程調整の依頼を1通のメールにまとめて送りたい。お客様が「次に何をすればいいか」がすぐわかる内容にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'sales-req2')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">3</span>
+                <span class="req-text">
+                  <strong>月次営業報告のまとめ文を作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">数字と出来事を箇条書きで入力すれば、上司向けの報告書っぽい文章に整えてほしい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'sales-req3')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="sales-req3">【リクエスト】
+営業担当として、バラバラとメモした今月の活動内容（訪問件数・受注数・課題）を、上司への月次報告に使えるきれいな文章にまとめたい。入力は箇条書きのメモで、出力は報告書形式にしてほしい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'sales-req3')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">4</span>
+                <span class="req-text">
+                  <strong>断られた時の返答メールを書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">「今回は見送ります」と言われた後も関係を維持できる、丁寧な返信メールを書きたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'sales-req4')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="sales-req4">【リクエスト】
+お客様から「今回の導入は見送ります」という断りの連絡をもらった。今後の関係を維持しながら、感謝と今後もご縁があればという気持ちを伝える返信メールを書きたい。しつこくならず、好印象を残せる内容にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'sales-req4')">▶ 組み立て済みプロンプトを見る</button>
+
+            </ul>
+          </div>
+        </section>
+
+        <!-- ④ 情シス -->
+        <section id="it">
+          <div class="section-label">💻 情シス</div>
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">💻</span>
+              <span class="job-title">情シス担当者が悩みやすいシーン</span>
+              <span class="job-badge">リクエスト例 4つ</span>
+            </div>
+            <ul class="req-list">
+
+              <li>
+                <span class="req-num">1</span>
+                <span class="req-text">
+                  <strong>システム障害・メンテナンスの案内文を書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">IT知識がない社員にもわかりやすく、パニックにならない案内文を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'it-req1')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="it-req1">【リクエスト】
+情シス担当として、社内グループウェアのメンテナンス（〇時間停止）を全社員に告知する案内文を作りたい。IT用語を使わず、非技術系社員でも「何をどうすればいいか」がわかる、シンプルで親しみやすい文章にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'it-req1')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">2</span>
+                <span class="req-text">
+                  <strong>セキュリティ注意喚起メールを書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">フィッシング詐欺や不審メールについて、社員が実際に気をつけてくれる文章を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'it-req2')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="it-req2">【リクエスト】
+情シス担当として、最近増えているフィッシングメールについて全社員に注意喚起したい。脅しすぎず、でも真剣さが伝わる文章で、具体的にどんなメールに気をつければいいか・怪しいと思ったらどうすればいいかがわかる案内を作りたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'it-req2')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">3</span>
+                <span class="req-text">
+                  <strong>操作マニュアルをわかりやすく書き直したい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">技術者が書いた説明文を、一般社員向けにやさしい言葉で書き直してほしい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'it-req3')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="it-req3">【リクエスト】
+情シス担当として、社内システムの操作マニュアル（技術者が書いた版）を、パソコンが苦手な一般社員でもわかるように書き直したい。専門用語を使わず、手順を番号で追えるようにしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'it-req3')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">4</span>
+                <span class="req-text">
+                  <strong>IT機器の棚卸・管理ルールの案内文を作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">年次のPC・スマホ棚卸の依頼と回答方法を、わかりやすく伝える文章を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'it-req4')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="it-req4">【リクエスト】
+情シス担当として、全社員に年次IT機器棚卸の協力を依頼したい。対象機器の確認方法・回答フォームの使い方・締め切りを分かりやすく説明し、負担を感じさせず協力してもらえる案内文を作りたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'it-req4')">▶ 組み立て済みプロンプトを見る</button>
+
+            </ul>
+          </div>
+        </section>
+
+        <!-- ⑤ 経理 -->
+        <section id="accounting">
+          <div class="section-label">🧾 経理</div>
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">🧾</span>
+              <span class="job-title">経理担当者が悩みやすいシーン</span>
+              <span class="job-badge">リクエスト例 4つ</span>
+            </div>
+            <ul class="req-list">
+
+              <li>
+                <span class="req-num">1</span>
+                <span class="req-text">
+                  <strong>経費精算の締め切り案内を作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">毎月の経費精算を期限内に出してもらうための案内メールを作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'acc-req1')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="acc-req1">【リクエスト】
+経理担当として、全社員に毎月の経費精算の締め切りを知らせ、期限内に提出してもらうための案内メールを作りたい。忘れがちな社員に「提出しようかな」と思ってもらえる、やわらかくて親しみやすい文体にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'acc-req1')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">2</span>
+                <span class="req-text">
+                  <strong>勘定科目の使い分けを説明したい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">非経理社員がよく間違える「交際費・会議費・福利厚生費」の違いをわかりやすく説明したい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'acc-req2')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="acc-req2">【リクエスト】
+経理担当として、社員がよく混乱する「交際費・会議費・福利厚生費」の使い分けを、具体例を交えてわかりやすく説明する社内向けQ&A文書を作りたい。経理知識がない人でも「なるほど！」と思えるような説明にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'acc-req2')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">3</span>
+                <span class="req-text">
+                  <strong>取引先への支払い遅延のお詫びメールを書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">やむを得ない事情で支払いが遅れた際の、丁寧なお詫びと今後の対応を伝えるメールを作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'acc-req3')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="acc-req3">【リクエスト】
+経理担当として、取引先への支払いが社内事情（システム障害）で数日遅れることになってしまった。誠意が伝わるお詫びメールを作りたい。原因説明・謝罪・支払い予定日の明示・再発防止の意思を含め、今後の取引関係を維持できる文章にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'acc-req3')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">4</span>
+                <span class="req-text">
+                  <strong>年末調整の書類提出依頼を社員に送りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">難しい言葉を使わず、何をいつまでに提出すればいいかが一目でわかる案内文を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'acc-req4')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="acc-req4">【リクエスト】
+経理担当として、全社員向けに年末調整の書類提出依頼を作りたい。「何の書類を」「いつまでに」「どこに提出するか」が一目でわかる、シンプルで優しいトーンの案内文にしたい。税務知識がない社員でも迷わず対応できる内容にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'acc-req4')">▶ 組み立て済みプロンプトを見る</button>
+
+            </ul>
+          </div>
+        </section>
+
+        <!-- ⑥ 人事・採用・給与 -->
+        <section id="hr">
+          <div class="section-label">👥 人事・採用・給与</div>
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">👥</span>
+              <span class="job-title">人事・採用・給与担当者が悩みやすいシーン</span>
+              <span class="job-badge">リクエスト例 4つ</span>
+            </div>
+            <ul class="req-list">
+
+              <li>
+                <span class="req-num">1</span>
+                <span class="req-text">
+                  <strong>求人票の原稿を魅力的に書き直したい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">箇条書きのメモから、応募したくなる求人票の文章を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'hr-req1')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="hr-req1">【リクエスト】
+採用担当として、手元にある仕事内容・必要スキル・職場環境のメモをもとに、求職者が「応募したい！」と思えるような求人票の原稿を作りたい。仕事のやりがいや職場の雰囲気が伝わる、読みやすい文章にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'hr-req1')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">2</span>
+                <span class="req-text">
+                  <strong>内定辞退者への返信メールを書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">残念だけど後味よく、今後の縁も残せる丁寧な返信メールを作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'hr-req2')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="hr-req2">【リクエスト】
+採用担当として、内定を辞退された候補者への返信メールを書きたい。残念な気持ちを伝えつつも、候補者の選択を尊重して、今後の活躍を応援する温かいメッセージにしたい。企業イメージを守り、いつかまた縁があればという気持ちを込めたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'hr-req2')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">3</span>
+                <span class="req-text">
+                  <strong>給与・手当の変更を社員に案内したい</strong><br>
+                  <span style="font-size:.85män;color:#5a6a88;">制度変更の内容を正確に、でもわかりやすく社員に伝える案内文を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'hr-req3')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="hr-req3">【リクエスト】
+人事担当として、通勤手当の上限変更（改定内容あり）を全社員に案内する文章を作りたい。「いつから」「何が」「どう変わるか」が明確で、社員が混乱しないシンプルな案内文にしたい。問い合わせ先も含めてわかりやすく伝えたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'hr-req3')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">4</span>
+                <span class="req-text">
+                  <strong>面接評価シートのコメントを整理したい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">面接官がメモした箇条書きコメントを、採用会議で使える評価コメントにまとめたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'hr-req4')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="hr-req4">【リクエスト】
+採用担当として、面接後に面接官が残したメモ（箇条書き）をもとに、採用会議で使える候補者の評価コメントを作りたい。強み・懸念点・総合所見の構成で、採用判断に使えるわかりやすいまとめにしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'hr-req4')">▶ 組み立て済みプロンプトを見る</button>
+
+            </ul>
+          </div>
+        </section>
+
+        <!-- ⑦ 研修 -->
+        <section id="training">
+          <div class="section-label">📚 研修</div>
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">📚</span>
+              <span class="job-title">研修担当者が悩みやすいシーン</span>
+              <span class="job-badge">リクエスト例 3つ</span>
+            </div>
+            <ul class="req-list">
+
+              <li>
+                <span class="req-num">1</span>
+                <span class="req-text">
+                  <strong>新入社員研修のスケジュール案を作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">研修の目的とテーマを伝えれば、3日間のスケジュール表を作ってほしい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'tr-req1')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="tr-req1">【リクエスト】
+研修担当として、新入社員向けの3日間研修のスケジュール案を作りたい。ビジネスマナー・会社概要・業務基礎スキルをバランスよく組み込み、新入社員が無理なく学べるカリキュラムにしたい。午前・午後の時間割形式で作ってほしい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'tr-req1')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">2</span>
+                <span class="req-text">
+                  <strong>研修アンケートの回答を分析・まとめたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">集まった自由記述のコメントを、良い点・改善点に分けて整理してほしい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'tr-req2')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="tr-req2">【リクエスト】
+研修担当として、受講者から集めた研修後アンケートの自由記述コメント（複数）を、「良かった点」「改善すべき点」「次回への提案」に分類して整理したい。次の研修改善に活かせる、わかりやすいサマリーにまとめてほしい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'tr-req2')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">3</span>
+                <span class="req-text">
+                  <strong>eラーニング教材の説明文を作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">受講してもらいたい eラーニングコースの概要・対象者・所要時間などを案内する文章を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'tr-req3')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="tr-req3">【リクエスト】
+研修担当として、社内eラーニングシステムに新しく追加するコース（情報セキュリティ基礎）の紹介文を作りたい。受講者が「なぜこれを学ぶ必要があるのか」を理解でき、受講意欲が高まるような案内文にしたい。対象者・所要時間・学習内容も含めてわかりやすく。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'tr-req3')">▶ 組み立て済みプロンプトを見る</button>
+
+            </ul>
+          </div>
+        </section>
+
+        <!-- ⑧ 購買 -->
+        <section id="purchase">
+          <div class="section-label">📦 購買</div>
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">📦</span>
+              <span class="job-title">購買担当者が悩みやすいシーン</span>
+              <span class="job-badge">リクエスト例 3つ</span>
+            </div>
+            <ul class="req-list">
+
+              <li>
+                <span class="req-num">1</span>
+                <span class="req-text">
+                  <strong>取引先への見積依頼メールを書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">品名・数量・納期希望を伝えて、的確な見積を返してもらえるメールを作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'pur-req1')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="pur-req1">【リクエスト】
+購買担当として、取引先へ新しい資材の見積を依頼するメールを書きたい。品目・数量・仕様・納期希望を正確に伝え、相手がすぐに見積を作れるような情報を過不足なく含めた、丁寧なビジネスメールにしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'pur-req1')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">2</span>
+                <span class="req-text">
+                  <strong>複数の見積を比較して稟議書コメントを作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">A社・B社の見積情報を入力したら、上司への報告・稟議に使えるコメントを作ってほしい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'pur-req2')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="pur-req2">【リクエスト】
+購買担当として、複数社から取得した見積（金額・納期・条件）を比較し、どの会社に発注するか上司に説明するための稟議コメントを作りたい。選定理由が論理的に伝わり、承認をもらいやすい文章にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'pur-req2')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">3</span>
+                <span class="req-text">
+                  <strong>納期遅延の対応メールを書きたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">取引先から納期遅延の連絡がきた時に、社内関係者へ状況を報告するメールを作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'pur-req3')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="pur-req3">【リクエスト】
+購買担当として、仕入先から納期遅延の通知を受け取った。社内の生産管理・営業担当者に状況を正確に報告し、今後の対応策（代替調達の検討・スケジュール調整の依頼）を含めた社内連絡メールを作りたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'pur-req3')">▶ 組み立て済みプロンプトを見る</button>
+
+            </ul>
+          </div>
+        </section>
+
+        <!-- ⑨ 総務 -->
+        <section id="general">
+          <div class="section-label">🏢 総務</div>
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">🏢</span>
+              <span class="job-title">総務担当者が悩みやすいシーン</span>
+              <span class="job-badge">リクエスト例 3つ</span>
+            </div>
+            <ul class="req-list">
+
+              <li>
+                <span class="req-num">1</span>
+                <span class="req-text">
+                  <strong>社内イベントの案内文を作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">懇親会・防災訓練・健康診断など、参加してもらいやすい案内文を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'gen-req1')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="gen-req1">【リクエスト】
+総務担当として、全社員向けに社内懇親会（参加任意）の案内文を作りたい。日時・場所・費用・申込方法を分かりやすく伝えつつ、参加意欲が高まる明るいトーンの文章にしたい。参加を強制しない雰囲気も大切にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'gen-req1')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">2</span>
+                <span class="req-text">
+                  <strong>オフィスの利用ルール変更を周知したい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">会議室予約ルール・ゴミ分別ルールなどの変更を、社員が守ってくれるように伝えたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'gen-req2')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="gen-req2">【リクエスト】
+総務担当として、会議室の予約ルール変更（直前予約禁止・当日キャンセル連絡必須）を全社員に周知したい。なぜルールが変わったかの背景も軽く添えて、守ってもらいやすい納得感のある案内文にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'gen-req2')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">3</span>
+                <span class="req-text">
+                  <strong>テレワーク・働き方ルールの変更案内を作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">テレワーク日数の変更や新制度の導入を、社員が納得できるように丁寧に伝えたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'gen-req3')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="gen-req3">【リクエスト】
+総務担当として、テレワーク上限日数の変更（月20日→15日）を全社員に案内したい。変更の理由と適用開始日を明示し、社員が「納得して受け入れられる」よう丁寧な表現にしたい。問い合わせ先も含めて案内したい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'gen-req3')">▶ 組み立て済みプロンプトを見る</button>
+
+            </ul>
+          </div>
+        </section>
+
+        <!-- ⑩ 法務 -->
+        <section id="legal">
+          <div class="section-label">⚖️ 法務</div>
+          <div class="job-card">
+            <div class="job-header">
+              <span class="job-icon">⚖️</span>
+              <span class="job-title">法務担当者が悩みやすいシーン</span>
+              <span class="job-badge">リクエスト例 3つ</span>
+            </div>
+            <ul class="req-list">
+
+              <li>
+                <span class="req-num">1</span>
+                <span class="req-text">
+                  <strong>契約書の要点を整理してほしい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">業務委託契約書やNDAの条文を貼り付けて、注意すべきポイントをまとめてほしい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'leg-req1')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="leg-req1">【リクエスト】
+法務担当（または非法務の契約確認担当者）として、取引先から届いた業務委託契約書の条文を読み込み、「自社にとってリスクになりそうな箇所」「確認・交渉が必要な条項」を整理したい。弁護士に相談する前の事前整理として使いたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'leg-req1')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">2</span>
+                <span class="req-text">
+                  <strong>社内規程の改定案をわかりやすく整理したい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">就業規則の改定案の文章が難しくて、一般社員向けの説明資料を作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'leg-req2')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="leg-req2">【リクエスト】
+法務・人事担当として、就業規則の改定条文（法律用語が多く難しい）を、一般社員向けにわかりやすく説明するQ&A資料を作りたい。「何が変わったか」「自分にどう影響するか」が直感的に理解できる内容にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'leg-req2')">▶ 組み立て済みプロンプトを見る</button>
+
+              <hr class="divider-soft">
+
+              <li>
+                <span class="req-num">3</span>
+                <span class="req-text">
+                  <strong>取引先へのクレーム対応レターを作りたい</strong><br>
+                  <span style="font-size:.85rem;color:#5a6a88;">契約不履行・品質問題に対して、毅然とかつ冷静に事実と要望を伝えるレターを作りたい</span>
+                </span>
+                <button class="req-copy" onclick="copyRequest(this,'leg-req3')">📋 コピー</button>
+              </li>
+              <div class="assembled-prompt" id="leg-req3">【リクエスト】
+法務担当として、取引先に納品物の品質不良に関するクレームレターを作りたい。事実（発生した問題・日時・証拠）を正確に記載し、改善・補償・再発防止策の要求を明確に伝える、冷静かつ毅然とした文書にしたい。感情的にならず、法的根拠も踏まえた表現にしたい。
+
+---
+上記のリクエストに応えるため、
+対話型AIが最高の成果を出すためには、
+どのようなプロンプトを与えればよいですか？
+
+リクエストへの直接の回答は不要ですので、
+プロンプトの中身だけを例示してください。</div>
+              <button class="show-btn" onclick="toggleAssembled(this,'leg-req3')">▶ 組み立て済みプロンプトを見る</button>
+
+            </ul>
+          </div>
+        </section>
+
+        <!-- ⑪ 注意事項 -->
+        <section id="caution">
+          <h2>⚠️ 使う際の注意事項</h2>
+          <div class="caution-box">
+            <div class="caution-title">⚠️ 必ずご確認ください</div>
+            <ul class="emoji-list">
+              <li data-emoji="●">氏名・住所・電話番号・マイナンバーなどの<strong>個人情報は絶対に入力しない</strong></li>
+              <li data-emoji="●">社外秘・機密情報（売上数値・製品仕様・人事情報など）は入力しない</li>
+              <li data-emoji="●">AIの回答は誤りを含む場合があります。<strong>必ず人間が内容を確認</strong>してから使用してください</li>
+              <li data-emoji="●">法務・税務など専門的判断が必要な内容は、必ず専門家に最終確認を</li>
+            </ul>
+          </div>
+          <div class="hint-box" style="margin-top:14px;">
+            <div class="hint-title">🚀 まとめ：3ステップで悩み解決！</div>
+            <ol class="step-list" style="margin:0;">
+              <li>
+                <div class="step-body">
+                  <div class="step-title">やりたいことを普通の言葉で【リクエスト】に書く</div>
+                  <div class="step-desc">「メールを書きたい」「案内文を作りたい」など、気軽な言葉でOKです🌱</div>
+                </div>
+              </li>
+              <li>
+                <div class="step-body">
+                  <div class="step-title">魔法のプロンプトをコピーして Claude に送る</div>
+                  <div class="step-desc">AIが「こういうプロンプトを使うといいよ」と教えてくれます🌿</div>
+                </div>
+              </li>
+              <li>
+                <div class="step-body">
+                  <div class="step-title">AIが提案してくれたプロンプトを使って本番の質問をする</div>
+                  <div class="step-desc">これで悩まず、最高のプロンプトで業務が進められます🌳</div>
+                  <div class="step-hint">🎉 プロンプトに迷ったら「AIに聞く」が最強の答え！</div>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <div class="footer">
+          <span class="copyright-pill"><strong>Powered by Oz</strong></span>
+        </div>
+
+      </div><!-- /.wrap -->
+    </main>
+
+  </div><!-- /.layout -->
+</div><!-- /.shell -->
+
+<script>
+/* ── コピー（テキストIDで） ── */
+function copyById(id, btn) {
+  const el = document.getElementById(id);
+  let text = el ? el.innerText : '';
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ コピーしました！';
+    btn.style.background = 'linear-gradient(135deg,#d1fae5,#34d399,#059669)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+  }).catch(() => {
+    if (el) {
+      const r = document.createRange(); r.selectNode(el);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(r);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+    }
+    btn.innerHTML = '✅ コピーしました！';
+    setTimeout(() => { btn.innerHTML = '📋 魔法のプロンプトをコピー'; }, 2000);
+  });
+}
+
+/* ── リクエスト例ボタンからコピー ── */
+function copyRequest(btn, assembledId) {
+  const el = document.getElementById(assembledId);
+  const text = el ? el.innerText : '';
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ OK!';
+    btn.style.background = 'linear-gradient(135deg,#d1fae5,#34d399,#059669)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
+  }).catch(() => {
+    btn.textContent = '✅ OK!';
+    setTimeout(() => { btn.textContent = '📋 コピー'; }, 2000);
+  });
+}
+
+/* ── 組み立て済みプロンプトの展開/折りたたみ ── */
+function toggleAssembled(btn, id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isShown = el.classList.toggle('show');
+  btn.textContent = isShown ? '▼ 折りたたむ' : '▶ 組み立て済みプロンプトを見る';
+}
+</script>
+</body>
+</html>

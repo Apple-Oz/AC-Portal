@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🤖QCC｜AI超初心者向け！試してみたい質問ベスト10</title>
+
+  <style>
+    :root{
+      --bg:#eef1f7; --card:#ffffff; --ink:#1a2233; --muted:#5a6a88; --brand:#1a7fd4; --accent:#40a8f0; --bd:#a0c8f0;
+      --gradient:linear-gradient(135deg,#e0f2fe,#38bdf8,#0284c7,#1e3a8a);
+    }
+    html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',Meiryo,sans-serif;line-height:1.75}
+    .shell{max-width:1080px;margin:24px auto;padding:0 16px}
+    .appbar{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 14px;box-shadow:0 8px 30px rgba(37,99,235,.10);position:sticky;top:10px;z-index:10}
+    .appbar .row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand .ttl{font-size:1.2rem;font-weight:750;letter-spacing:.02em;background:var(--gradient);color:#fff;padding:4px 12px;border-radius:10px;}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}
+    @media (max-width: 900px){.layout{grid-template-columns:1fr} .nav{margin-bottom:16px;position:relative;top:0} }
+    .nav{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .nav h3{font-size:.95rem;margin:.25rem 0 .5rem;color:#1a7fd4;font-weight:700}
+    .nav a{display:block;padding:10px 12px;margin:6px 0;color:var(--ink);text-decoration:none;border-radius:10px;font-weight:500}
+    .nav a:hover{background:#eff8ff;border:1px dashed #a0c8f0;color:#1a7fd4}
+    .page{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;box-shadow:0 16px 40px rgba(26,127,212,.12)}
+    .wrap{max-width:720px}
+    h1{font-size:1.75rem;margin:.2rem 0 .6rem;color:#1a7fd4;font-weight:800}
+    h2{font-size:1.2rem;margin:1.25rem 0 .45rem;color:#1a7fd4;font-weight:700}
+    .list{padding-left:1.6rem}
+    .emoji-list li{list-style:none;position:relative;padding-left:1.4em;margin:.4rem 0}
+    .emoji-list li::before{content:attr(data-emoji);position:absolute;left:0;color:#1a7fd4;font-size:.8em;line-height:2;}
+    .footer{color:var(--muted);font-size:.92rem;margin-top:20px;text-align:center}
+    .copyright-pill{display:block;margin-top:8px;background:#eff8ff;border:2px solid #40a8f0;color:#1a7fd4;font-weight:800;border-radius:999px;padding:6px 16px;font-size:.9rem;text-align:center;}
+    .back-home{display:inline-flex;align-items:center;gap:.5em;background:#eff8ff;color:#1a7fd4;border:1.5px solid #40a8f0;padding:8px 12px;border-radius:10px;font-weight:700;text-decoration:none}
+    .back-home:hover{background:#dbeeff}
+
+    /* ステップカード */
+    .step-list{list-style:none;padding:0;margin:12px 0 0;counter-reset:steps}
+    .step-list li{counter-increment:steps;display:flex;align-items:flex-start;gap:12px;padding:12px 14px;margin-bottom:10px;background:#f7fbff;border:1px solid #b6d9f5;border-radius:12px;position:relative}
+    .step-list li::before{content:counter(steps);min-width:28px;height:28px;border-radius:50%;background:var(--gradient);color:#fff;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .step-list li .step-body{flex:1}
+    .step-list li .step-title{font-weight:700;color:#0284c7;margin-bottom:3px}
+    .step-list li .step-desc{font-size:.93rem;color:#344;line-height:1.65}
+    .step-list li .step-hint{display:inline-block;margin-top:5px;background:#eff8ff;border:1px dashed #40a8f0;color:#1a7fd4;font-size:.82rem;border-radius:8px;padding:3px 9px}
+
+    /* 比較テーブル */
+    .cmp-table{width:100%;border-collapse:collapse;margin:12px 0 4px;font-size:.93rem}
+    .cmp-table th{background:var(--gradient);color:#fff;padding:10px 12px;text-align:center;font-weight:700}
+    .cmp-table th:first-child{border-radius:10px 0 0 0}
+    .cmp-table th:last-child{border-radius:0 10px 0 0}
+    .cmp-table td{padding:9px 12px;border:1px solid #b6d9f5;vertical-align:top;background:#fff}
+    .cmp-table tr:last-child td:first-child{border-radius:0 0 0 10px}
+    .cmp-table tr:last-child td:last-child{border-radius:0 0 10px 0}
+    .cmp-table .feature-col{font-weight:600;color:#1a2233;white-space:nowrap;width:20%}
+
+    /* 注意ボックス */
+    .caution-box{background:#fffbeb;border:2px solid #fbbf24;border-radius:12px;padding:14px 18px;margin:10px 0}
+    .caution-box .caution-title{color:#b45309;font-weight:800;font-size:1rem;margin-bottom:6px}
+
+    /* ランキングカード */
+    .rank-card{border-radius:14px;margin-bottom:18px;overflow:hidden;box-shadow:0 4px 18px rgba(26,127,212,.10);border:1.5px solid #b6d9f5;}
+    .rank-header{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--gradient);color:#fff;}
+    .rank-num{font-size:2rem;font-weight:900;min-width:52px;text-align:center;line-height:1;}
+    .rank-crown{font-size:1.5rem;margin-left:2px;}
+    .rank-title-block{}
+    .rank-q{font-size:1.05rem;font-weight:800;letter-spacing:.01em;}
+    .rank-sub{font-size:.85rem;opacity:.88;margin-top:2px;}
+    .rank-body{padding:14px 18px 16px;background:#f7fbff;}
+    .rank-prompt-label{font-size:.82rem;color:#1a7fd4;font-weight:700;margin-bottom:4px;}
+    .rank-prompt{background:#eff8ff;border:1.5px dashed #40a8f0;border-radius:10px;padding:10px 14px;font-size:.97rem;color:#0284c7;font-weight:600;margin-bottom:10px;}
+    .rank-answer-label{font-size:.82rem;color:#5a6a88;font-weight:700;margin-bottom:4px;}
+    .rank-answer{background:#fff;border:1px solid #b6d9f5;border-radius:10px;padding:10px 14px;font-size:.93rem;color:#344;line-height:1.7;}
+    .rank-point{display:inline-block;margin-top:8px;background:linear-gradient(135deg,#fef9c3,#fde68a);border:1px solid #fbbf24;color:#92400e;font-size:.82rem;border-radius:8px;padding:4px 10px;font-weight:700;}
+
+    /* メダル色 */
+    .rank-gold .rank-header{background:linear-gradient(135deg,#fef3c7,#f59e0b,#b45309);}
+    .rank-silver .rank-header{background:linear-gradient(135deg,#e2e8f0,#94a3b8,#475569);}
+    .rank-bronze .rank-header{background:linear-gradient(135deg,#fde8d8,#cd7f50,#7c3a1e);}
+
+    /* 導入バナー */
+    .intro-banner{background:linear-gradient(135deg,#eff8ff,#dbeeff);border:2px solid #40a8f0;border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:14px;}
+    .intro-banner .icon{font-size:2.2rem;flex-shrink:0;}
+    .intro-banner .intro-text{font-size:.95rem;color:#1a2233;line-height:1.75;}
+    .intro-banner .intro-text strong{color:#0284c7;}
+
+    /* 使い方ヒント */
+    .tip-box{background:linear-gradient(135deg,#f0fdf4,#d1fae5);border:2px solid #6ee7b7;border-radius:12px;padding:14px 18px;margin:16px 0;}
+    .tip-box .tip-title{color:#047857;font-weight:800;margin-bottom:6px;}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="appbar" role="banner">
+    <div class="row">
+      <div class="brand">
+        <div class="ttl">🤖 AI‑Driven Quality. Powered by Oz. 🧩</div>
+      </div>
+      <div class="brand" style="gap:10px;">
+        <div style="font-size:.9rem;color:#4a4a4a;font-weight:600;">🌱 AIでできる事を広げよう！ ✨</div>
+        <a class="back-home" href="../index.html" aria-label="トップページに戻る">➡ 🏠</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <nav class="nav" aria-label="ページ内メニュー">
+      <h3>🏆 ランキング目次</h3>
+      <a href="#intro">はじめに</a>
+      <a href="#rank10">第10位 ✨ 四字熟語診断</a>
+      <a href="#rank9">第9位 🏚 廃業コンビニ診断</a>
+      <a href="#rank8">第8位 🔮 前世予想</a>
+      <a href="#rank7">第7位 📜 古事記メール</a>
+      <a href="#rank6">第6位 🎋 ことわざ人生相談</a>
+      <a href="#rank5">第5位 🛋 部屋で性格分析</a>
+      <a href="#rank4">第4位 🎬 ドキュメンタリー</a>
+      <a href="#rank3">第3位 🌙 月曜哲学</a>
+      <a href="#rank2">第2位 🍱 コンビニ食べ物診断</a>
+      <a href="#rank1">第1位 🏆 AIに一言もらう</a>
+      <a href="#howto">上手な使い方のコツ</a>
+      <a class="back-home" href="index.html" style="margin-top:10px;">🏠 トップページに戻る</a>
+    </nav>
+
+    <main class="page">
+      <div class="wrap">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:.4rem;">
+          <div>
+            <h1 style="margin:0;">AI超初心者向け！😊<br>試してみたい質問<br>ベスト10 🏆</h1>
+            <p style="color:#5a6a88;font-size:.95rem;margin-top:6px;">「こんなこと聞いていいの？」が面白い！</p>
+          </div>
+          <div style="text-align:center;flex-shrink:0;">
+            <div style="font-size:5rem;line-height:1;">🤖</div>
+            <div style="font-size:.8rem;color:#5a6a88;font-weight:700;">AIと仲良くなろう！</div>
+          </div>
+        </div>
+
+        <!-- はじめに -->
+        <section id="intro">
+          <div class="intro-banner">
+            <div class="icon">💡</div>
+            <div class="intro-text">
+              このページは <strong>AIを使ったことがない・使いはじめたばかりの方</strong> に向けた、楽しいお試し質問集です。<br>
+              正解のない「くだらない質問」ほど、AIの面白さがわかります。<strong>気軽に話しかけてみましょう！</strong><br>
+              各質問には <strong>実際の回答例</strong> もついているので、どんな答えが来るかイメージしやすくなっています✨
+            </div>
+          </div>
+        </section>
+
+        <!-- 第10位 -->
+        <section id="rank10">
+          <div class="rank-card">
+            <div class="rank-header">
+              <div class="rank-num">10<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">✨ 今の自分に必要な四字熟語を選んで！</div>
+                <div class="rank-sub">なぜか刺さる。真顔で分析してくれる。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「今の自分に必要な四字熟語を1つ選んで、理由も教えて。最近、仕事が忙しくて少し疲れ気味です。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                今のあなたに必要な四字熟語は <strong>「初志貫徹（しょしかんてつ）」</strong> です。<br><br>
+                忙しい日々の中で、最初にその仕事を始めたときの気持ち・目的を思い出すことが大切です。疲れているときほど、「なぜ自分はこれをやっているのか」という原点に戻ることが、前に進む力になります。<br>
+                少し立ち止まって深呼吸してみてください😊
+              </div>
+              <div class="rank-point">🌟 ポイント：自分の状況を説明するほど、的確な言葉が返ってくる！</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第9位 -->
+        <section id="rank9">
+          <div class="rank-card">
+            <div class="rank-header">
+              <div class="rank-num">9<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">🏚 自分が廃業したコンビニだったら？</div>
+                <div class="rank-sub">存在しない自分の過去が語られる不思議体験。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「もし自分が廃業したコンビニだったら、どんなコンビニ？私は慎重で計画的、でも少し心配性な性格です。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                あなたは <strong>「品質にこだわりすぎて売れなかった高級コンビニ」</strong> です！<br><br>
+                おにぎりは全て国産米で毎朝手作り、消費期限の管理も完璧。でも価格が少し高くなってしまい、近くにできた大手チェーンに客を取られてしまいました。閉店の日、常連のおじいさんが「ここのおにぎりが一番美味しかったのに」と言って泣いてくれました。<br>
+                <span style="color:#5a6a88;font-size:.9rem;">（あなたの丁寧さと慎重さは、本当はとても大切な才能ですよ😌）</span>
+              </div>
+              <div class="rank-point">🌟 ポイント：シュールな質問ほど、AIは真剣に答えてくれる！</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第8位 -->
+        <section id="rank8">
+          <div class="rank-card">
+            <div class="rank-header">
+              <div class="rank-num">8<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">🔮 今週の行動から前世を予想して！</div>
+                <div class="rank-sub">月曜残業＋コンビニスイーツ爆買いで前世が出てくる。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「今週の私の行動を聞いて、前世を予想して。月曜は残業、火曜はコンビニスイーツを3つ買い、水曜は早起きして朝ラン、木曜は後輩の相談にのった。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                今週の行動パターンから予想する前世は… <strong>「江戸時代の町医者」</strong> です！<br><br>
+                昼夜問わず患者のために働き（残業・朝ラン）、疲れた体を甘いもので癒し（スイーツ爆買い）、困っている人の話を親身に聞く（後輩の相談）。あなたの前世は、貧しい人からもお金を取らず、夜中でも往診に行く献身的な医者だったようです。現世でもその気質はしっかり受け継がれていますね😊
+              </div>
+              <div class="rank-point">🌟 ポイント：情報が多いほど、面白くて詳しい回答になる！</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第7位 -->
+        <section id="rank7">
+          <div class="rank-card">
+            <div class="rank-header">
+              <div class="rank-num">7<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">📜 上司へのメールを古事記っぽく書いて！</div>
+                <div class="rank-sub">「然れども、納期は厳守すべし」が出てくる。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「上司への『明日の会議の資料が間に合いません』という謝罪メールを、古事記っぽい文体で書いて。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                <strong>件名：資料完成の儀につき、遅延のご報告</strong><br><br>
+                〇〇部長 殿<br><br>
+                恐れながら申し上げ候。明日の御会議に向け、資料作成の儀に精進いたしておりましたるところ、誠に遺憾ながら期日までの完成、叶わぬ見通しとなりました。<br>
+                これひとえに、この者の不徳の致すところにて、深くお詫び申し上げる次第にございます。然れども、〇〇日までには必ずや完成の暁を迎え、御覧に入れる所存にございます。<br>
+                <span style="color:#5a6a88;font-size:.9rem;">（実際には使わないでください😂 でも「文体を変えて」という指示がAIに伝わることが体験できます！）</span>
+              </div>
+              <div class="rank-point">🌟 ポイント：「〇〇っぽく書いて」は最高の練習！文体を自在に変えられる。</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第6位 -->
+        <section id="rank6">
+          <div class="rank-card">
+            <div class="rank-header">
+              <div class="rank-num">6<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">🎋 悩みをことわざだけで解決して！</div>
+                <div class="rank-sub">全部ことわざで返してくる謎の人生相談コーナーが始まる。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「私の悩みを聞いて、解決策をことわざだけで答えて。悩みは『同僚と意見が合わなくて困っている』です。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                それは難しいお悩みですね。ことわざでお答えします。<br><br>
+                まず… <strong>「郷に入っては郷に従え」</strong>。相手のやり方を一度受け入れてみては。<br>
+                それでも難しければ… <strong>「三人寄れば文殊の知恵」</strong>。第三者を交えた話し合いを。<br>
+                そして最後は… <strong>「雨降って地固まる」</strong>。今の衝突が、のちの強い信頼関係をつくります。<br><br>
+                <span style="color:#5a6a88;font-size:.9rem;">（なぜか妙に納得してしまう、ことわざ人生相談😊）</span>
+              </div>
+              <div class="rank-point">🌟 ポイント：「〇〇だけで答えて」という縛りがAIを面白くする！</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第5位 -->
+        <section id="rank5">
+          <div class="rank-card rank-silver" style="border-color:#94a3b8;">
+            <div class="rank-header">
+              <div class="rank-num">5<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">🛋 部屋の3アイテムで性格分析！</div>
+                <div class="rank-sub">「スマホ・薬・ポテチ」→ 妙に当たってて怖くなる。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「自分の部屋を見渡して、3つアイテムを言うから、私の性格を分析して。今見えるのは：手帳・お茶のペットボトル・付箋の束 です。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                この3つから読み取れるあなたの性格は…<br><br>
+                <strong>「几帳面で準備上手、でも少し抱え込みやすい真面目タイプ」</strong> です！<br><br>
+                📓 手帳 → 計画性があり、物事を書いて整理しないと落ち着かない。<br>
+                🍵 お茶 → 落ち着いた空間を好み、リラックスを大切にしている。<br>
+                📌 付箋の束 → タスクや気づきを逃さず記録する几帳面さ、しかし付箋が「束」なのは、やることリストが増えがちなことも示しています😊<br><br>
+                もっと自分をほめてあげてください！
+              </div>
+              <div class="rank-point">🌟 ポイント：身の回りのものを使うと、より「自分ごと」に感じられる！</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第4位 -->
+        <section id="rank4">
+          <div class="rank-card rank-silver" style="border-color:#94a3b8;">
+            <div class="rank-header">
+              <div class="rank-num">4<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">🎬 自分の人生がドキュメンタリーなら？</div>
+                <div class="rank-sub">「彼女は今日も、目覚ましを3回止めた——」が出てくる。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「もし私の今日1日がドキュメンタリーになるとしたら、ナレーターは何を言う？今日は朝寝坊して、昼に急ぎの仕事が入り、夕方なんとか終わらせた日です。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                <em style="color:#0284c7;">「——午前8時。目覚ましは3度、静寂に葬られた。</em><br><br>
+                <em style="color:#0284c7;">慌ただしく始まったその朝、彼女には知る由もなかった。今日が、試練の一日になろうとは。昼過ぎ、突然の依頼が舞い込む。締め切りは——今日中。</em><br><br>
+                <em style="color:#0284c7;">しかし彼女は折れなかった。コーヒーを飲み干し、キーボードを叩き続けた。夕暮れ時、静かな達成感とともに、送信ボタンが押された。今日も、彼女は生き延びた。」</em><br><br>
+                <span style="color:#5a6a88;font-size:.9rem;">（読んでいて「自分すごくない？」という気持ちになる魔法😂）</span>
+              </div>
+              <div class="rank-point">🌟 ポイント：日常を「ドラマ仕立て」にすることで、AIの表現力が体感できる！</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第3位 -->
+        <section id="rank3">
+          <div class="rank-card rank-bronze" style="border-color:#cd7f50;">
+            <div class="rank-header">
+              <div class="rank-num">3<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">🌙 月曜の朝がつらい理由を哲学的に説明して！</div>
+                <div class="rank-sub">ガチで哲学してくる。なぜか読んでしまう。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「なぜ月曜の朝はこんなにつらいのか、哲学的に説明してください。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                哲学的に考えると、月曜の朝のつらさは <strong>「自由と義務の境界線上に立つ人間の実存的苦悩」</strong> と言えます。<br><br>
+                週末という「自由の時間」は、私たちに「本来の自己」を思い出させます。しかし月曜の朝、私たちは再び「社会的役割としての自己」へと戻ることを強いられる。フランスの哲学者サルトルは「人間は自由という刑に処せられている」と言いましたが、月曜の朝こそ、その自由と責任の重さを最も強烈に感じる瞬間ではないでしょうか。<br><br>
+                つまり、あなたが月曜をつらく感じるのは——<strong>あなたが真剣に生きている証拠です。</strong>
+              </div>
+              <div class="rank-point">🌟 ポイント：「哲学的に」という一言で、AIの回答が劇的に深くなる！</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第2位 -->
+        <section id="rank2">
+          <div class="rank-card rank-silver" style="border-color:#94a3b8;">
+            <div class="rank-header">
+              <div class="rank-num">2<br><span style="font-size:.7rem;font-weight:600;">位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">🍱 コンビニの食べ物に例えて！</div>
+                <div class="rank-sub">理由込みで返ってくるのが妙にリアルで笑える。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「私を食べ物に例えて。ただし、コンビニで売ってるやつで。私は真面目で頑張り屋だけど、たまにぐったりします。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                あなたにぴったりの食べ物は… <strong>「栄養バランス弁当（糖質オフ・タンパク質多め）」</strong> です！<br><br>
+                見た目は地味だけど、中身はとても充実している。健康的で真面目、誰かの役に立ちたいという気持ちが詰まっています。でも毎日それだと少し疲れて、たまに「今日はシュークリームだけでいいや…」となる日もある。<br>
+                そんな、<strong>ちゃんと頑張れる、でも人間らしい、素敵な弁当</strong> がぴったりです😊
+              </div>
+              <div class="rank-point">🌟 ポイント：「条件をつける」ことで回答がユニークになる。条件指定の練習に最適！</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 第1位 -->
+        <section id="rank1">
+          <div class="rank-card rank-gold" style="border-color:#f59e0b;">
+            <div class="rank-header">
+              <div class="rank-num">🏆<br><span style="font-size:.75rem;font-weight:600;">第1位</span></div>
+              <div class="rank-title-block">
+                <div class="rank-q">「今の私に一言、言ってみて」</div>
+                <div class="rank-sub">何も情報がないのに、なぜかちょっといいことを言ってくる。これが最もシュールで、最も「AIってなんなんだろう」となる質問。</div>
+              </div>
+            </div>
+            <div class="rank-body">
+              <div class="rank-prompt-label">📝 こう入力してみよう</div>
+              <div class="rank-prompt">「今の私に一言、言ってみて。」</div>
+              <div class="rank-answer-label">💬 AIの回答例</div>
+              <div class="rank-answer">
+                <strong>「今日も、ちゃんとここにいる。それだけで十分です。」</strong><br><br>
+                何か大きなことを成し遂げなくても、完璧じゃなくても、あなたが今日という日を過ごしてここにいること、それ自体にちゃんと意味があります。<br>
+                少し疲れていても、少し迷っていても、大丈夫。明日またゆっくり考えればいい。<br><br>
+                今日のあなた、おつかれさまでした😊
+              </div>
+              <div class="rank-point">🏆 なぜ第1位？ 何も伝えていないのに「的を射た言葉」が返ってくる体験が、AIへの興味を一番引き出すから。「AIってどうやってこれを…？」という驚きが生まれます。</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 上手な使い方 -->
+        <section id="howto">
+          <h2>🎓 AIと上手に話すための3つのコツ</h2>
+          <ol class="step-list">
+            <li>
+              <div class="step-body">
+                <div class="step-title">「追加指示」を出してみよう</div>
+                <div class="step-desc">回答が返ってきたら「もっと短くして」「箇条書きにして」「もっとおもしろく」などと追加してみましょう。AIは指示を重ねるほど便利になります。</div>
+                <div class="step-hint">💡 一発目が思い通りでなくてもOK！</div>
+              </div>
+            </li>
+            <li>
+              <div class="step-body">
+                <div class="step-title">情報をたくさん教えるほど精度が上がる</div>
+                <div class="step-desc">「相談したい」だけより、「30代・女性・事務職で〇〇に悩んでいる」と書くほど、ぴったりな答えが返ってきます。</div>
+                <div class="step-hint">📝 背景・状況・目的を添えよう</div>
+              </div>
+            </li>
+            <li>
+              <div class="step-body">
+                <div class="step-title">間違えても大丈夫！気軽に話しかけよう</div>
+                <div class="step-desc">AIは怒りません。変な質問も、うまく言えない質問も、全部真剣に答えてくれます。まずは「面白半分」で試してみることが一番の近道！</div>
+                <div class="step-hint">😊 失敗なし！とにかく試してみよう</div>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <!-- まとめ表 -->
+        <section>
+          <h2>📊 10問まとめ早見表</h2>
+          <table class="cmp-table" aria-label="ベスト10まとめ">
+            <thead>
+              <tr>
+                <th style="width:8%">順位</th>
+                <th style="width:42%">質問テーマ</th>
+                <th style="width:25%">おすすめの人</th>
+                <th style="width:25%">学べること</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align:center;font-weight:800;color:#f59e0b;">🏆1</td>
+                <td>「今の私に一言言ってみて」</td>
+                <td>全員！まず最初に</td>
+                <td>AIの意外な共感力</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;font-weight:800;color:#94a3b8;">2位</td>
+                <td>コンビニ食べ物に例えて</td>
+                <td>ユーモアが好きな人</td>
+                <td>条件指定の練習</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;font-weight:800;color:#cd7f50;">3位</td>
+                <td>月曜の朝を哲学的に</td>
+                <td>深く考えるのが好きな人</td>
+                <td>指示ひと言で深さが変わる</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">4位</td>
+                <td>人生ドキュメンタリー</td>
+                <td>文章表現に興味がある人</td>
+                <td>AIの文章力・表現力</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">5位</td>
+                <td>部屋の3アイテムで性格分析</td>
+                <td>自己分析が好きな人</td>
+                <td>状況を説明して精度UP</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">6位</td>
+                <td>ことわざだけで人生相談</td>
+                <td>制約・ゲーム感が好きな人</td>
+                <td>「縛り条件」の使い方</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">7位</td>
+                <td>古事記っぽいメール</td>
+                <td>業務に活かしたい人</td>
+                <td>文体・トーン変換の応用</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">8位</td>
+                <td>今週の行動で前世予想</td>
+                <td>遊び感覚で使いたい人</td>
+                <td>情報が多いほど面白くなる</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">9位</td>
+                <td>廃業コンビニ診断</td>
+                <td>個性的な体験をしたい人</td>
+                <td>シュールな質問への反応</td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">10位</td>
+                <td>今の自分に必要な四字熟語</td>
+                <td>モチベを上げたい人</td>
+                <td>状況共有で的確な回答</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div class="tip-box" style="margin-top:20px;">
+          <div class="tip-title">💚 最後に一言</div>
+          正解のない「くだらない質問」ほど、AIの面白さがわかります。<br>
+          まずは気軽に、第1位の <strong>「今の私に一言、言ってみて」</strong> から試してみてください😊
+        </div>
+
+        <div class="footer">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 6px;">
+            <span style="font-size:1.5rem;">🤖</span>
+          </div>
+          <span class="copyright-pill"><strong>Powered by Oz</strong></span>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>
+</body>
+</html>

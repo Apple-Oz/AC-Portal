@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🤖QCC｜部門別メール対応AIプロンプトガイド</title>
+  <style>
+    :root{
+      --bg:#eef1f7; --card:#ffffff; --ink:#1a2233; --muted:#5a6a88;
+      --brand:#1a7fd4; --accent:#40a8f0; --bd:#a0c8f0;
+      --gradient:linear-gradient(135deg,#e0f2fe,#38bdf8,#0284c7,#1e3a8a);
+    }
+    *{box-sizing:border-box;}
+    html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',Meiryo,sans-serif;line-height:1.75;margin:0;padding:0;}
+    .shell{max-width:1080px;margin:24px auto;padding:0 16px;}
+
+    /* ===== APPBAR ===== */
+    .appbar{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 14px;box-shadow:0 8px 30px rgba(37,99,235,.10);position:sticky;top:10px;z-index:100;}
+    .appbar .row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+    .brand{display:flex;align-items:center;gap:12px;}
+    .brand .ttl{font-size:1.2rem;font-weight:750;letter-spacing:.02em;background:var(--gradient);color:#fff;padding:4px 12px;border-radius:10px;}
+    .back-home{display:inline-flex;align-items:center;gap:.5em;background:#eff8ff;color:#1a7fd4;border:1.5px solid #40a8f0;padding:8px 12px;border-radius:10px;font-weight:700;text-decoration:none;}
+    .back-home:hover{background:#dbeeff;}
+
+    /* ===== LAYOUT ===== */
+    .layout{display:grid;grid-template-columns:260px 1fr;gap:18px;margin-top:18px;}
+    @media(max-width:900px){.layout{grid-template-columns:1fr;}}
+
+    /* ===== NAV ===== */
+    .nav{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.06);align-self:start;position:sticky;top:90px;}
+    @media(max-width:900px){.nav{position:relative;top:0;}}
+    .nav h3{font-size:.95rem;margin:.25rem 0 .5rem;color:#1a7fd4;font-weight:700;}
+    .nav a{display:flex;align-items:center;gap:6px;padding:9px 12px;margin:4px 0;color:var(--ink);text-decoration:none;border-radius:10px;font-weight:500;font-size:.9rem;}
+    .nav a:hover{background:#eff8ff;border:1px dashed #a0c8f0;color:#1a7fd4;}
+    .nav .dept-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+    /* ===== PAGE ===== */
+    .page{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:28px 24px;box-shadow:0 16px 40px rgba(26,127,212,.12);}
+    h1{font-size:1.65rem;margin:.2rem 0 .5rem;color:#1a7fd4;font-weight:800;}
+    h2.dept-title{font-size:1.15rem;margin:2.2rem 0 .8rem;font-weight:800;padding:10px 16px;border-radius:10px;color:#fff;display:flex;align-items:center;gap:10px;}
+    h3.scene-title{font-size:.98rem;margin:1.4rem 0 .4rem;color:#1a2233;font-weight:700;display:flex;align-items:center;gap:6px;}
+
+    /* ===== INFO BOX ===== */
+    .info-box{background:#f0f8ff;border-left:4px solid #40a8f0;border-radius:6px;padding:12px 16px;margin-top:10px;font-size:.94rem;color:#1a2233;}
+
+    /* ===== 部門カラー ===== */
+    .dept-hr   {background:linear-gradient(135deg,#f43f5e,#fb7185);}  /* 人事 */
+    .dept-ac   {background:linear-gradient(135deg,#0ea5e9,#38bdf8);}  /* 経理 */
+    .dept-ga   {background:linear-gradient(135deg,#10b981,#34d399);}  /* 総務 */
+    .dept-lgl  {background:linear-gradient(135deg,#8b5cf6,#a78bfa);}  /* 法務 */
+    .dept-pur  {background:linear-gradient(135deg,#f59e0b,#fbbf24);}  /* 購買 */
+    .dept-sal  {background:linear-gradient(135deg,#1a7fd4,#40a8f0);}  /* 営業 */
+
+    .dot-hr {background:#f43f5e;}
+    .dot-ac {background:#0ea5e9;}
+    .dot-ga {background:#10b981;}
+    .dot-lgl{background:#8b5cf6;}
+    .dot-pur{background:#f59e0b;}
+    .dot-sal{background:#1a7fd4;}
+
+    /* ===== プロンプトカード ===== */
+    .prompt-card{border:1px solid #c8dff5;border-radius:12px;padding:16px 18px;margin:.8rem 0;background:#fafcff;transition:box-shadow .2s;}
+    .prompt-card:hover{box-shadow:0 6px 20px rgba(26,127,212,.13);}
+
+    .situation-badge{display:inline-block;font-size:.74rem;font-weight:700;border-radius:6px;padding:2px 9px;margin-bottom:8px;color:#fff;}
+    .badge-receive {background:#6366f1;}  /* 受信対応 */
+    .badge-send    {background:#1a7fd4;}  /* 送信 */
+    .badge-claim   {background:#ef4444;}  /* クレーム */
+    .badge-thanks  {background:#f59e0b;}  /* お礼 */
+    .badge-request {background:#10b981;}  /* 依頼 */
+    .badge-remind  {background:#8b5cf6;}  /* リマインド */
+    .badge-decline {background:#64748b;}  /* お断り */
+    .badge-confirm {background:#0ea5e9;}  /* 確認 */
+
+    .scene-desc{font-size:.88rem;color:#5a6a88;margin-bottom:10px;}
+
+    /* ===== プロンプトボックス ===== */
+    .prompt-wrap{position:relative;margin-top:6px;}
+    .prompt-label-top{font-size:.76rem;font-weight:700;color:#1a7fd4;margin-bottom:4px;display:flex;align-items:center;gap:4px;}
+    .prompt-box{background:#f0f4ff;border:1.5px dashed #90b8e8;border-radius:8px;padding:12px 50px 12px 14px;font-size:.83rem;color:#1a2233;white-space:pre-wrap;line-height:1.7;font-family:inherit;}
+    .copy-btn{position:absolute;top:8px;right:8px;background:#1a7fd4;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-size:.75rem;font-weight:700;cursor:pointer;transition:background .2s;}
+    .copy-btn:hover{background:#0e5fa8;}
+    .copy-btn.copied{background:#22c55e;}
+
+    /* ===== ポイント ===== */
+    .point-box{background:#fff8e1;border-left:4px solid #f59e0b;border-radius:6px;padding:8px 14px;font-size:.83rem;color:#6b4a00;margin-top:8px;}
+
+    /* ===== 使い方ガイド ===== */
+    .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;}
+    @media(max-width:700px){.how-grid{grid-template-columns:1fr;}}
+    .how-card{background:#f0f8ff;border:1px solid #a0c8f0;border-radius:10px;padding:14px 16px;text-align:center;}
+    .how-card .how-num{font-size:1.5rem;font-weight:900;color:#1a7fd4;}
+    .how-card .how-title{font-weight:700;font-size:.9rem;margin:4px 0 2px;}
+    .how-card .how-desc{font-size:.82rem;color:#5a6a88;}
+
+    /* ===== 注意ボックス ===== */
+    .warn-box{background:#fff0f0;border-left:4px solid #ef4444;border-radius:6px;padding:10px 14px;margin-top:8px;font-size:.88rem;color:#7a0000;}
+
+    /* ===== FOOTER ===== */
+    .footer{color:var(--muted);font-size:.9rem;margin-top:48px;padding-top:24px;border-top:2px solid var(--bd);text-align:center;}
+    .copyright-pill{display:block;margin-top:8px;background:#eff8ff;border:2px solid #40a8f0;color:#1a7fd4;font-weight:800;border-radius:999px;padding:6px 16px;font-size:.88rem;}
+
+    /* ===== 区切り ===== */
+    .divider{border:none;border-top:1.5px solid #dce8f5;margin:2rem 0;}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ===== APPBAR ===== -->
+  <div class="appbar" role="banner">
+    <div class="row">
+      <div class="brand">
+        <div class="ttl">🤖 AI‑Driven Quality. Powered by Oz. 🧩</div>
+      </div>
+      <div class="brand" style="gap:10px;">
+        <div style="font-size:.9rem;color:#4a4a4a;font-weight:600;">🌱 AIでできる事を広げよう！ ✨</div>
+        <a class="back-home" href="../index.html">➡ 🏠</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ===== NAV ===== -->
+    <nav class="nav" aria-label="ページ内メニュー">
+      <h3>📂 部門で探す</h3>
+      <a href="#how"><span class="dept-dot" style="background:#1a7fd4;"></span>使い方ガイド</a>
+      <a href="#hr"><span class="dept-dot dot-hr"></span>👥 人事部門</a>
+      <a href="#ac"><span class="dept-dot dot-ac"></span>💰 経理部門</a>
+      <a href="#ga"><span class="dept-dot dot-ga"></span>🏢 総務部門</a>
+      <a href="#lgl"><span class="dept-dot dot-lgl"></span>⚖️ 法務部門</a>
+      <a href="#pur"><span class="dept-dot dot-pur"></span>🛒 購買部門</a>
+      <a href="#sal"><span class="dept-dot dot-sal"></span>📈 営業部門</a>
+      <a href="#tips">⚠️ 注意事項</a>
+      <a class="back-home" href="index.html" style="margin-top:10px;">🏠 トップページに戻る</a>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main class="page">
+
+      <h1>部門別 メール対応<br>AIプロンプトガイド 📧</h1>
+
+      <div class="info-box">
+        このページでは、<strong>人事・経理・総務・法務・購買・営業</strong>の各部門で日々発生するメール対応を、AIで素早く・丁寧に仕上げるための<strong>すぐ使えるプロンプト</strong>を紹介します。<br>
+        青い「📋 コピー」ボタンを押すだけでプロンプトをコピーでき、AIにそのまま貼り付けて使えます！
+      </div>
+
+      <!-- ===== 使い方 ===== -->
+      <section id="how">
+        <h2 class="dept-title dept-sal" style="margin-top:1.5rem;">💡 3ステップで使う方法</h2>
+        <div class="how-grid">
+          <div class="how-card">
+            <div class="how-num">①</div>
+            <div class="how-title">プロンプトをコピー</div>
+            <div class="how-desc">「📋 コピー」ボタンを押して、使いたいプロンプトをコピーする</div>
+          </div>
+          <div class="how-card">
+            <div class="how-num">②</div>
+            <div class="how-title">AIに貼り付けて情報を追加</div>
+            <div class="how-desc">ChatGPT / Claude などを開き、貼り付け後に【　】の中を自分の情報に書き換える</div>
+          </div>
+          <div class="how-card">
+            <div class="how-num">③</div>
+            <div class="how-title">生成して確認・送信</div>
+            <div class="how-desc">AIが作ったメールを読んで、必要なら「もう少し丁寧に」など追加指示して完成！</div>
+          </div>
+        </div>
+        <div class="point-box" style="margin-top:12px;">
+          💡 <strong>【　】で囲まれた部分</strong>は、あなたの状況に合わせて書き換える箇所です。そのまま貼っても動きますが、具体的に書くほど精度が上がります！
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ===================================================== -->
+      <!-- 👥 人事                                               -->
+      <!-- ===================================================== -->
+      <section id="hr">
+        <h2 class="dept-title dept-hr">👥 人事部門のメール対応</h2>
+
+        <!-- 採用通知 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-send">📤 送信</span>
+          採用通知メールを送る
+        </h3>
+        <p class="scene-desc">面接合格の通知を、候補者へ丁寧かつ明確に伝えるメールを作成します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト（コピーして使ってください）</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-hr-1">以下の条件で、採用通知メールを作成してください。
+
+【宛先】候補者氏名：【山田 太郎】様
+【ポジション】【営業部 営業担当】
+【入社予定日】【2026年4月1日】
+【連絡事項】入社書類の提出期限は【3月15日】、提出先は人事部
+
+■トーン：丁寧で温かみのあるビジネス文体
+■形式：件名・本文・署名欄を含むメール形式
+■補足：候補者が安心して入社準備を進められるよう、次のステップを明確に書いてください。</div>
+            <button class="copy-btn" onclick="copyPrompt('p-hr-1',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 【　】の中を実際の情報に書き換えるだけで使えます。入社日や書類の内容はご自身のルールに合わせて変更してください。</div>
+        </div>
+
+        <!-- 不採用通知 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-decline">🚫 お断り</span>
+          不採用通知メールを送る
+        </h3>
+        <p class="scene-desc">応募者への不採用通知を、相手を傷つけず敬意を持って伝えます。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-hr-2">以下の条件で、不採用通知メールを作成してください。
+
+【宛先】候補者氏名：【鈴木 花子】様
+【応募ポジション】【総務部 アシスタント】
+【選考結果】今回は残念ながら不採用
+
+■トーン：丁寧かつ相手を尊重した文体。傷つけない表現を使う。
+■形式：件名・本文・署名欄を含むメール形式
+■注意：不採用の具体的な理由は書かない。応募してくれたことへの感謝と、今後の活躍を祈る一言を必ず入れる。</div>
+            <button class="copy-btn" onclick="copyPrompt('p-hr-2',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 不採用理由は原則書かない方が無難です。「今後のご活躍をお祈り申し上げます」という一文もAIが自然に入れてくれます。</div>
+        </div>
+
+        <!-- 勤怠クレーム -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-claim">🚨 クレーム対応</span>
+          給与・勤怠ミスへのお詫びと訂正連絡
+        </h3>
+        <p class="scene-desc">給与計算ミスや勤怠の記録誤りが発覚した際、社員へお詫びと修正の連絡をします。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-hr-3">以下の状況で、社員へのお詫びと訂正連絡メールを作成してください。
+
+【宛先】【田中 一郎】様（社員番号：【A0245】）
+【発生した問題】【2026年1月分の給与で、時間外手当が2時間分、計算に漏れていた】
+【対応内容】【2月25日の給与振込時に不足分を合わせて支払い済み】
+【原因】【担当者の入力ミス】
+
+■トーン：誠実に謝罪し、再発防止の姿勢を示す。感情的にならない落ち着いた文体。
+■形式：件名・本文・署名欄を含むメール形式
+■必須：謝罪・原因・対応済みの事実・再発防止の方針 の4点を必ず含めること。</div>
+            <button class="copy-btn" onclick="copyPrompt('p-hr-3',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 給与ミスは社員の信頼に関わります。AIに「誠実さ」を強調して指示することで、言い訳がましくならない謝罪文が生成されます。</div>
+        </div>
+
+        <!-- 研修案内 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-send">📤 送信</span>
+          研修・セミナーの案内メールを送る
+        </h3>
+        <p class="scene-desc">全社・部門向けに研修の開催案内を、わかりやすく整理して送ります。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-hr-4">以下の内容で、社員向けの研修案内メールを作成してください。
+
+【研修名】【2026年度 ハラスメント防止研修】
+【対象者】【全社員】
+【日時】【2026年3月18日（火）14:00〜16:00】
+【場所】【本社3F 大会議室 / オンライン（Zoom）同時開催】
+【参加方法】【社内ポータルから3月10日までに申込必須】
+【その他】参加は必須。欠席の場合は事前に上長へ報告のこと。
+
+■トーン：わかりやすく親しみやすい。しかし必須参加であることはしっかり伝える。
+■形式：件名・本文・申込方法を箇条書きで含むメール形式</div>
+            <button class="copy-btn" onclick="copyPrompt('p-hr-4',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 研修案内は「誰が・いつ・どこで・どうやって参加するか」を明確に書くことがポイントです。AIが自動的に整理してくれます。</div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ===================================================== -->
+      <!-- 💰 経理                                               -->
+      <!-- ===================================================== -->
+      <section id="ac">
+        <h2 class="dept-title dept-ac">💰 経理部門のメール対応</h2>
+
+        <!-- 請求書の送付 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-send">📤 送信</span>
+          請求書を送付するメールを作る
+        </h3>
+        <p class="scene-desc">取引先に請求書を送付する際の、丁寧な添付メールを作成します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-ac-1">以下の条件で、請求書の送付メールを作成してください。
+
+【宛先】【株式会社ABCコーポレーション 経理部 佐藤様】
+【請求内容】【2026年2月分 システム保守費用】
+【請求金額】【110,000円（税込）】
+【支払期限】【2026年3月31日】
+【振込先】【みずほ銀行 新宿支店 普通 1234567 日本企画株式会社】
+【添付ファイル名】【請求書_202602_ABC様.pdf】
+
+■トーン：丁寧かつ簡潔なビジネス文体
+■形式：件名・本文・署名欄を含むメール形式
+■備考：「ご不明な点はご連絡ください」の一文も入れること</div>
+            <button class="copy-btn" onclick="copyPrompt('p-ac-1',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 振込先と支払期限を明記することで、支払い漏れや問い合わせを減らせます。AIが整理して読みやすいメールにまとめてくれます。</div>
+        </div>
+
+        <!-- 入金確認・お礼 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-thanks">🙏 お礼</span>
+          入金確認のお礼メールを送る
+        </h3>
+        <p class="scene-desc">取引先から入金を確認したことを丁寧に伝え、感謝を述べるメールです。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-ac-2">以下の条件で、入金確認のお礼メールを作成してください。
+
+【宛先】【株式会社DEFパートナーズ 総務部 山本様】
+【入金確認日】【2026年2月26日】
+【入金内容】【2026年1月分 業務委託費 220,000円（税込）】
+
+■トーン：簡潔・丁寧・温かみのあるビジネス文体
+■形式：件名・本文・署名欄を含むメール形式
+■補足：今後の継続した取引への感謝と期待感も一言添えること</div>
+            <button class="copy-btn" onclick="copyPrompt('p-ac-2',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 入金確認のお礼メールはシンプルですが、関係強化の大切な機会です。AIで素早く、かつ温かみある文章を作れます。</div>
+        </div>
+
+        <!-- 支払い遅延のクレーム -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-claim">🚨 クレーム対応</span>
+          支払い遅延についてのお詫びメールを書く
+        </h3>
+        <p class="scene-desc">自社の支払いが遅延してしまった際、取引先へ誠実に謝罪します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-ac-3">以下の状況で、支払い遅延についてのお詫びメールを作成してください。
+
+【宛先】【株式会社GHI商事 経理部 鈴木様】
+【遅延した支払い内容】【2026年1月分の材料費 330,000円（税込）】
+【本来の支払期限】【2026年2月28日】
+【支払い予定日】【2026年3月10日】
+【遅延の理由】【社内の決裁フローの遅延】（※理由は軽く触れる程度でよい）
+
+■トーン：誠実に謝罪。言い訳がましくならず、相手への配慮を示す。
+■形式：件名・本文・署名欄を含むメール形式
+■必須：謝罪・支払い予定日・今後の再発防止 の3点を含めること</div>
+            <button class="copy-btn" onclick="copyPrompt('p-ac-3',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 支払い遅延は取引先との信頼を損ないます。AIに「誠実さ・再発防止」を強調することで、適切な謝罪文が生成されます。</div>
+        </div>
+
+        <!-- 経費精算リマインド -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-remind">🔔 リマインド</span>
+          経費精算の締め切りリマインドを送る
+        </h3>
+        <p class="scene-desc">月次の経費精算締め切りを社員に知らせるリマインドメールです。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-ac-4">以下の条件で、経費精算のリマインドメールを作成してください。
+
+【宛先】全社員
+【対象月】【2026年2月分】
+【締め切り日】【2026年3月5日（木）17時】
+【提出方法】【社内システム（経費精算アプリ）から申請。領収書は原本を経理部まで郵送】
+【締め切りを過ぎた場合】翌月に繰り越し処理となり、支払いが遅れる旨を伝える
+
+■トーン：フレンドリーだが、期限厳守をしっかり伝える。
+■形式：件名・本文（箇条書きを含む）・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-ac-4',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「フレンドリーだが期限は厳守」というトーン指定がポイント。押しつけがましくなく、かつ忘れられないリマインドになります。</div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ===================================================== -->
+      <!-- 🏢 総務                                               -->
+      <!-- ===================================================== -->
+      <section id="ga">
+        <h2 class="dept-title dept-ga">🏢 総務部門のメール対応</h2>
+
+        <!-- 施設利用案内 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-send">📤 送信</span>
+          社内設備・施設の利用ルール変更を通知する
+        </h3>
+        <p class="scene-desc">会議室・駐車場・共用スペースなどのルール変更を全社員に周知します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-ga-1">以下の内容で、社内設備のルール変更通知メールを作成してください。
+
+【対象施設】【本社ビル 地下駐車場】
+【変更内容】【来訪者専用スペースを現在の5台から10台に拡大。その分、社員用スペースが20台から15台に変更】
+【変更開始日】【2026年3月1日（日）より】
+【申込方法】【社員駐車場の使用希望者は総務部へ3月10日までに再申請】
+【問い合わせ先】【総務部 山田（内線：2201）】
+
+■トーン：わかりやすく明確。困惑させず、前向きに説明する。
+■形式：件名・本文（変更点を箇条書き）・問い合わせ先・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-ga-1',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 変更内容は箇条書きで指示すると、AIが読みやすい形に整えてくれます。</div>
+        </div>
+
+        <!-- 備品故障クレーム受信 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-receive">📥 受信対応</span>
+          社員からの備品故障・クレーム報告に返信する
+        </h3>
+        <p class="scene-desc">社員から備品の故障報告やクレームを受けた際の、丁寧な受付・対応連絡です。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-ga-2">社員から以下のクレームメールを受けました。総務部として返信メールを作成してください。
+
+【受信したクレームの内容】
+「3Fの複合機（コピー機）が2日前から動いていません。急ぎの書類が印刷できず業務に支障が出ています。早急に対応してください。」
+
+【総務部の現状・対応予定】
+・メーカーへ修理依頼済み（本日午前中に連絡）
+・修理の訪問は【明日（3月1日）午後】の予定
+・それまでの代替機として【4Fの複合機を使用可】と案内
+
+■トーン：申し訳ない気持ちと迅速な対応姿勢を示す。落ち着いたトーン。
+■形式：件名・本文・対応状況の箇条書き・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-ga-2',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「受信したクレームの内容」をそのままAIに渡すのがコツ。状況を読み取って最適な返信を作ってくれます。</div>
+        </div>
+
+        <!-- 取引先への感謝 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-thanks">🙏 お礼</span>
+          業者・取引先への感謝メールを送る
+        </h3>
+        <p class="scene-desc">オフィス移転・工事・イベントなど、お世話になった業者や取引先に感謝を伝えます。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-ga-3">以下の条件で、業者へのお礼メールを作成してください。
+
+【宛先】【〇〇引越サービス株式会社 担当：木村様】
+【お礼の理由】【2026年2月22〜23日に実施した本社オフィス移転作業を丁寧・迅速に対応していただいた】
+【特に感謝したい点】【予定より1時間早く終了し、精密機器も無事に運んでくれた】
+【今後の関係】今後も機会があれば引き続きお願いしたい
+
+■トーン：温かく誠実。過剰にならずシンプルに感謝を伝える。
+■形式：件名・本文・署名欄を含むメール形式</div>
+            <button class="copy-btn" onclick="copyPrompt('p-ga-3',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「特に感謝したい点」を具体的に書くほど、気持ちが伝わるお礼メールになります。AIが自然な流れで盛り込んでくれます。</div>
+        </div>
+
+        <!-- 社内イベント案内 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-send">📤 送信</span>
+          社内イベントの案内メールを作る
+        </h3>
+        <p class="scene-desc">懇親会・社員旅行・健康診断など、社内イベントの告知メールを作成します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-ga-4">以下の内容で、社内イベントの案内メールを作成してください。
+
+【イベント名】【2026年度 新入社員歓迎懇親会】
+【対象】【全社員（任意参加）】
+【日時】【2026年4月11日（土）18:00〜20:30】
+【場所】【〇〇レストラン 新宿店（新宿駅南口 徒歩3分）】
+【参加費】【社員3,000円（会社補助あり）】
+【申込期限】【3月28日（金）】
+【申込方法】【社内ポータルの申込フォームから】
+
+■トーン：明るく楽しい雰囲気。参加を促すが強制感は出さない。
+■形式：件名・本文・申込方法の案内・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-ga-4',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「明るくて強制感がない」というトーン指定が大事。AIが自然と「ぜひご参加ください！」という雰囲気の文章にまとめてくれます。</div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ===================================================== -->
+      <!-- ⚖️ 法務                                               -->
+      <!-- ===================================================== -->
+      <section id="lgl">
+        <h2 class="dept-title dept-lgl">⚖️ 法務部門のメール対応</h2>
+
+        <!-- 契約書確認依頼 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-request">📨 依頼</span>
+          契約書のレビュー依頼メールを送る
+        </h3>
+        <p class="scene-desc">他部署から届いた契約書について、法務部内または外部弁護士にレビューを依頼します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-lgl-1">以下の条件で、契約書のレビュー依頼メールを作成してください。
+
+【宛先】【顧問弁護士 〇〇法律事務所 田中先生】
+【依頼内容】【添付の業務委託契約書のレビュー（特に第5条・第8条の損害賠償条項と守秘義務条項を重点的に確認してほしい）】
+【契約の相手方】【株式会社JKLシステムズ（新規取引先）】
+【回答希望期限】【2026年3月7日（金）】
+【添付ファイル】【業務委託契約書_JKL様_v1.0.docx】
+
+■トーン：丁寧・簡潔。依頼目的と確認箇所を明確にする。
+■形式：件名・本文（依頼背景・確認ポイント・期限）・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-lgl-1',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「特に確認してほしい条項」を具体的に伝えると、的確なレビューが返ってきます。AIがその情報をきれいにまとめます。</div>
+        </div>
+
+        <!-- 契約更新のお知らせ -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-confirm">🔵 確認</span>
+          契約更新の確認・交渉メールを送る
+        </h3>
+        <p class="scene-desc">既存の契約が満了に近づいた際、取引先に更新の確認や条件変更の打診をするメールです。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-lgl-2">以下の条件で、契約更新の確認メールを作成してください。
+
+【宛先】【株式会社MNOエンジニアリング 法務部 松本様】
+【現在の契約】【システム開発業務委託契約（2024年4月〜2026年3月31日）】
+【更新希望】更新を希望する
+【変更したい条件】【月額委託費を現在の50万円から55万円に変更したい（物価上昇のため）】
+【更新後の契約期間】【2026年4月1日〜2027年3月31日（1年間）】
+【回答期限】【2026年3月14日】
+
+■トーン：誠実かつ建設的。良好な関係を維持しながら条件変更を提案する。
+■形式：件名・本文（現状確認→変更提案→期限）・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-lgl-2',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 価格変更の提案は、「良好な関係を維持しながら」という指定が大事。AIが角を立てない表現で作ってくれます。</div>
+        </div>
+
+        <!-- 法的警告への対応 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-claim">🚨 クレーム対応</span>
+          クレーム・法的警告レターへの初期対応メール
+        </h3>
+        <p class="scene-desc">取引先や外部から法的なクレーム・警告が届いた際の、初期受付・確認メールを作成します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-lgl-3">以下の状況で、クレームへの初期対応メールを作成してください。
+
+【宛先】【株式会社PQRデザイン 法務部 高橋様】
+【受けたクレームの概要】【当社のウェブサイト上のデザインが、先方の著作権を侵害しているとの主張】
+【現時点での当社の立場】現在確認中。事実関係を社内で調査している段階。
+【次のアクション】社内調査後、2週間以内に改めて回答する予定
+
+■トーン：誠実・慎重。法的なリスクを避けるため、この段階では事実を認めず、調査中であることを明確にする。
+■形式：件名・本文・署名欄
+■注意：事実の認否は一切行わない。「検討・確認中」という姿勢を維持する。</div>
+            <button class="copy-btn" onclick="copyPrompt('p-lgl-3',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 法的クレームへの初期対応では「事実を認めない」ことが重要です。AIへの指示で「事実の認否は一切行わない」と明記するのがポイント。最終的には必ず弁護士に確認してください。</div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ===================================================== -->
+      <!-- 🛒 購買                                               -->
+      <!-- ===================================================== -->
+      <section id="pur">
+        <h2 class="dept-title dept-pur">🛒 購買部門のメール対応</h2>
+
+        <!-- 見積依頼 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-request">📨 依頼</span>
+          仕入先に見積もりを依頼するメールを送る
+        </h3>
+        <p class="scene-desc">新規または既存の仕入先に対して、商品・サービスの見積もりを依頼します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-pur-1">以下の条件で、仕入先への見積依頼メールを作成してください。
+
+【宛先】【〇〇オフィス用品株式会社 営業部 中村様】
+【依頼内容・品目】
+  - コピー用紙A4（500枚/箱）×100箱
+  - ボールペン（黒）×200本
+  - クリアファイル（A4・10枚入り）×50セット
+【納品希望日】【2026年3月15日】
+【納品先】【東京都新宿区〇〇 本社 総務部宛】
+【見積回答期限】【2026年3月3日（月）】
+
+■トーン：礼儀正しく簡潔。取引先として対等なビジネス文体。
+■形式：件名・本文（品目を表または箇条書き）・回答期限・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-pur-1',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 品目が複数ある場合は箇条書きで貼り付けるとAIがきれいな表形式または箇条書きにまとめてくれます。</div>
+        </div>
+
+        <!-- 発注確認お礼 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-thanks">🙏 お礼</span>
+          発注・納品完了のお礼メールを送る
+        </h3>
+        <p class="scene-desc">発注した商品が無事に納品された際、仕入先への確認とお礼を伝えるメールです。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-pur-2">以下の条件で、納品完了のお礼メールを作成してください。
+
+【宛先】【〇〇製造株式会社 営業部 前田様】
+【納品された商品】【工場用手袋（Mサイズ）500セット】
+【納品日】【2026年2月25日】
+【納品状況】問題なく受領済み。品質も良好。
+【次回の取引】継続して発注予定
+
+■トーン：シンプルで温かみのあるビジネス文体
+■形式：件名・本文・署名欄
+■補足：今後の良好な関係継続への期待を一言添えること</div>
+            <button class="copy-btn" onclick="copyPrompt('p-pur-2',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「品質も良好」という一言を入れると、仕入先も安心して次の取引に臨めます。関係強化のひと手間をAIが代わりに表現してくれます。</div>
+        </div>
+
+        <!-- 納品遅延クレーム -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-claim">🚨 クレーム</span>
+          仕入先の納品遅延についてクレームを入れる
+        </h3>
+        <p class="scene-desc">発注した商品が期日に届かなかった際、仕入先に状況確認と催促をするメールです。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-pur-3">以下の状況で、納品遅延についてのクレームメールを作成してください。
+
+【宛先】【〇〇資材株式会社 営業部 井上様】
+【発注内容】【鉄鋼材料 規格品A 100kg × 10箱（発注番号：PO-2026-0145）】
+【約束の納品期日】【2026年2月20日】
+【現在の状況】本日2026年2月27日時点でも未着。連絡もなし。
+【当社への影響】生産ラインが止まっており、損失が発生している
+
+■トーン：怒りを抑えた冷静な文体。ただし、状況の深刻さと対応の緊急性はしっかり伝える。
+■形式：件名・本文（状況説明→影響→求める対応）・署名欄
+■求める対応：①現在の状況の説明　②納品見込み日の明示　③再発防止策の提示</div>
+            <button class="copy-btn" onclick="copyPrompt('p-pur-3',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「冷静だが深刻さは伝える」という絶妙なバランスをAIに指示できます。感情的にならずに強いメッセージを伝えられます。</div>
+        </div>
+
+        <!-- 価格交渉 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-request">📨 依頼</span>
+          仕入先に価格交渉のメールを送る
+        </h3>
+        <p class="scene-desc">継続取引の仕入先に対して、価格見直しの交渉を丁重に依頼するメールです。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-pur-4">以下の条件で、価格交渉の依頼メールを作成してください。
+
+【宛先】【〇〇化学工業株式会社 営業部 坂本様】
+【現在の取引内容】【洗浄剤Aを月30万円で継続購入（3年間の取引実績あり）】
+【交渉内容】【昨今のコスト削減の観点から、5〜10%の価格引き下げを検討してほしい】
+【理由】【競合他社からも同等品の見積もりを取得中である旨を軽く伝える（圧力をかけすぎない）】
+
+■トーン：良好な関係を維持しながら、率直に相談する姿勢。押しつけがましくならない。
+■形式：件名・本文（実績に触れ→交渉理由→お願い）・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-pur-4',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「競合他社の見積もりを取得中」という情報をうまく使いながらも、関係を壊さない書き方をAIが自然に表現してくれます。</div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ===================================================== -->
+      <!-- 📈 営業                                               -->
+      <!-- ===================================================== -->
+      <section id="sal">
+        <h2 class="dept-title dept-sal">📈 営業部門のメール対応</h2>
+
+        <!-- 新規営業 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-send">📤 送信</span>
+          新規顧客へのアプローチメールを送る
+        </h3>
+        <p class="scene-desc">まだ取引のない企業・担当者に、自社サービスを知ってもらうための最初のメールです。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-sal-1">以下の条件で、新規顧客へのアプローチメールを作成してください。
+
+【宛先】【株式会社STUコンサルティング 総務部長 河野様】（面識なし）
+【自社サービス】【クラウド型の勤怠管理システム「タイムスマート」。月額1万円〜。導入実績500社以上。】
+【相手の課題（推定）】【中小企業で紙・Excelで勤怠管理をしており、集計に時間がかかっていると想定】
+【アクション希望】30分のオンライン説明会への参加
+
+■トーン：押しつけがましくなく、相手の課題に寄り添う提案型。読んで損しないと感じさせる文体。
+■形式：件名（開封されやすいもの）・本文（共感→価値提案→CTA）・署名欄
+■文字数：本文200〜300字程度（読みやすさ重視）</div>
+            <button class="copy-btn" onclick="copyPrompt('p-sal-1',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 新規営業メールは「短く・相手の課題に刺さる内容」が命です。AIへの指示で文字数と構成を指定すると、読まれるメールになります。</div>
+        </div>
+
+        <!-- 商談後のお礼 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-thanks">🙏 お礼</span>
+          商談・打ち合わせ後のお礼メールを送る
+        </h3>
+        <p class="scene-desc">商談・オンライン打ち合わせの後、速やかに感謝と次のステップを伝えるメールです。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-sal-2">以下の条件で、商談後のお礼メールを作成してください。
+
+【宛先】【株式会社VWX物流 調達部 白川様】
+【商談日時】【2026年2月27日（木）14:00〜15:00 オンライン】
+【商談内容】【当社の物流管理システムの導入について初回打ち合わせ】
+【相手の関心・課題（商談で聞いた内容）】【現在のシステムが老朽化しており、2026年末をめどに更新を検討中】
+【次のアクション】【1週間以内に当社から提案資料を送付予定】
+
+■トーン：誠実で熱意が感じられる。ただし押しつけがましくない。
+■形式：件名・本文（お礼→商談内容の確認→次のステップ）・署名欄
+■補足：相手の課題をこちらが理解していることを示すと好印象</div>
+            <button class="copy-btn" onclick="copyPrompt('p-sal-2',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 商談後のお礼メールは「できるだけ当日中に送る」のがベスト。AIで短時間に仕上げて、印象が冷める前に送りましょう！</div>
+        </div>
+
+        <!-- クレーム対応 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-claim">🚨 クレーム対応</span>
+          顧客からのクレームに誠実に返信する
+        </h3>
+        <p class="scene-desc">商品やサービスに関するクレームメールを受け取った際、適切に対応します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-sal-3">顧客から以下のクレームを受けました。営業担当として返信メールを作成してください。
+
+【宛先】【株式会社YZAトレード 購買部 山口様】
+【受信したクレームの内容（要約）】
+「先月発注した商品（型番：XC-200、数量：50個）のうち、10個に傷があった。
+品質管理がしっかりしていないのではないか。今後の取引を考え直す必要があるかもしれない。」
+
+【現時点での当社の把握状況】
+・クレーム内容は事実として受け止める
+・原因は現在調査中（製造工程か梱包工程か不明）
+・対応方針：①お詫び　②代替品の手配（1週間以内に送付）　③返金または交換で対応
+
+■トーン：誠実に謝罪。関係を修復する姿勢を前面に出す。感情的な反論は絶対にしない。
+■形式：件名・本文（謝罪→事実確認→対応策→今後の対応）・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-sal-3',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「今後の取引を考え直す」という言葉があるクレームは最重要対応です。AIへの指示に「関係を修復する姿勢」を明記することで、信頼回復につながるメールが生成されます。</div>
+        </div>
+
+        <!-- 提案書の送付 -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-send">📤 送信</span>
+          提案書・見積書の送付メールを作る
+        </h3>
+        <p class="scene-desc">商談後に提案資料や見積書を送付する際の、添付メールを作成します。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-sal-4">以下の条件で、提案書・見積書の送付メールを作成してください。
+
+【宛先】【株式会社BCDリテール 情報システム部 西村様】
+【添付資料】
+  - 提案書：「在庫管理システム導入提案書_BCD様_v1.pdf」
+  - 見積書：「見積書_BCD様_20260227.xlsx」
+【商談日】【2026年2月20日】に初回打ち合わせ実施済み
+【提案の要点（メール内でも軽く触れたい）】【現在の手作業管理をシステム化し、棚卸し工数を月40時間削減できる見込み】
+【次のアクション】【1週間以内にご確認いただき、質問があればいつでも連絡を】
+
+■トーン：自信を持った提案。しかし押しつけがましくなく、相手のペースを尊重。
+■形式：件名・本文（お礼→提案の要点→資料の案内→次のアクション）・署名欄</div>
+            <button class="copy-btn" onclick="copyPrompt('p-sal-4',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 提案書の送付メールは「何がうれしいか（今回のケースなら月40時間削減）」をメール本文でも一言触れると開封・精読率が上がります。</div>
+        </div>
+
+        <!-- 失注後のフォロー -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-thanks">🙏 フォロー</span>
+          失注・お断りを受けた後のフォローメールを送る
+        </h3>
+        <p class="scene-desc">今回は受注できなかった場合でも、将来の取引につながるフォローメールを送ります。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-sal-5">以下の状況で、失注後のフォローメールを作成してください。
+
+【宛先】【株式会社DEFメーカー 調達部 小林様】
+【状況】提案していたシステム導入について「今回は他社に決定した」とお断りのメールを受けた。
+【今後の姿勢】今回は縁がなかったが、良好な関係を維持し将来の商機につなげたい
+
+■トーン：落ち込みを見せず、前向きで清々しいトーン。「また機会があれば」という姿勢。
+■形式：件名・本文（選定へのお礼→理解と前向きな姿勢→今後の関係への期待）・署名欄
+■文字数：短め（150字前後）。しつこくならない。</div>
+            <button class="copy-btn" onclick="copyPrompt('p-sal-5',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 失注後の対応が次の受注を生みます。「短め・しつこくない」という指定で、印象に残る清々しいメールになります。</div>
+        </div>
+
+        <!-- 見込み顧客へのリマインド -->
+        <h3 class="scene-title">
+          <span class="situation-badge badge-remind">🔔 リマインド</span>
+          長期間連絡がない見込み顧客へのリマインドを送る
+        </h3>
+        <p class="scene-desc">商談後、しばらく連絡がとれていない見込み顧客に対して、自然な形で再アプローチします。</p>
+        <div class="prompt-card">
+          <div class="prompt-label-top">💬 AIへのプロンプト</div>
+          <div class="prompt-wrap">
+            <div class="prompt-box" id="p-sal-6">以下の状況で、見込み顧客へのリマインドメールを作成してください。
+
+【宛先】【株式会社GHIサービス 人事部長 加藤様】
+【最後の接触】【2025年12月に商談実施。その後2ヶ月間、返信なし。】
+【状況】先方は当時「予算の関係で検討中」と言っていた。
+【リマインドのきっかけ】【新年度の予算が決まる時期になったので、再度ご検討いただけるかお伺いしたい】
+
+■トーン：しつこくなく、自然なきっかけを使って再アプローチ。相手に負担をかけない。
+■形式：件名・本文（近況確認的な導入→きっかけ→サポートの提案）・署名欄
+■文字数：短め（200字以内）。返信しやすい雰囲気。</div>
+            <button class="copy-btn" onclick="copyPrompt('p-sal-6',this)">📋 コピー</button>
+          </div>
+          <div class="point-box">📌 「新年度・予算期」などの自然なきっかけをうまく使うことで、しつこく感じさせないリマインドになります。AIへの指示に「きっかけ」を明記するのがポイントです。</div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ===== 注意事項 ===== -->
+      <section id="tips">
+        <h2 class="dept-title dept-sal">⚠️ 使う際の注意事項</h2>
+        <div class="warn-box" style="margin-bottom:12px;">
+          ⚠️ AIで作成したメールは、必ず送信前に内容を確認してください。特に以下の点に注意が必要です。
+        </div>
+        <div class="use-grid" style="margin-top:0;">
+          <div class="prompt-card">
+            <div class="scene-desc" style="font-weight:700;color:#1a2233;margin-bottom:4px;">🚫 個人情報・機密情報を入力しない</div>
+            <div class="scene-desc">社員の個人情報、取引先の非公開情報、契約金額など機密性の高い情報は、無料版AIには入力しないこと。社内ルールを確認してから使用しましょう。</div>
+          </div>
+          <div class="prompt-card">
+            <div class="scene-desc" style="font-weight:700;color:#1a2233;margin-bottom:4px;">✅ 送信前に必ず内容チェック</div>
+            <div class="scene-desc">AIは誤った情報や不自然な表現を生成することがあります。金額・日付・氏名・会社名などは特に確認してください。</div>
+          </div>
+          <div class="prompt-card">
+            <div class="scene-desc" style="font-weight:700;color:#1a2233;margin-bottom:4px;">⚖️ 法務関連はAI出力だけで完結させない</div>
+            <div class="scene-desc">法的な文書・クレーム対応は、AIの出力を「たたき台」として使い、最終的には必ず担当者・弁護士が確認・承認してください。</div>
+          </div>
+          <div class="prompt-card">
+            <div class="scene-desc" style="font-weight:700;color:#1a2233;margin-bottom:4px;">💡 「もっとよくして」と追加指示してOK</div>
+            <div class="scene-desc">最初の結果が気に入らなければ、「もう少し丁寧に」「短くして」「敬語を増やして」など追加指示を出せば調整できます。何度でも試してみましょう。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== FOOTER ===== -->
+      <div class="footer">
+        <div style="margin:6px 0;font-size:.85rem;color:#8a9ab5;">このページは、AI活用を広げるために作成された学習用ガイドです</div>
+        <span class="copyright-pill"><strong>Powered by Oz</strong></span>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===== コピー機能 ===== -->
+<script>
+  function copyPrompt(id, btn) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.innerText;
+      btn.innerText = '✅ コピー完了！';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerText = orig;
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(() => {
+      // フォールバック
+      const el = document.getElementById(id);
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.execCommand('copy');
+      sel.removeAllRanges();
+      btn.innerText = '✅ コピー完了！';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerText = '📋 コピー';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

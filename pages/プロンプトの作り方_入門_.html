@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🤖QCC｜プロンプトの作り方ガイド（初心者向け）</title>
+
+  <style>
+    :root{
+      --bg:#eef1f7; --card:#ffffff; --ink:#1a2233; --muted:#5a6a88; --brand:#1a7fd4; --accent:#40a8f0; --bd:#a0c8f0;
+      --gradient:linear-gradient(135deg,#e0f2fe,#38bdf8,#0284c7,#1e3a8a);
+    }
+    html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',Meiryo,sans-serif;line-height:1.75}
+    .shell{max-width:1080px;margin:24px auto;padding:0 16px}
+    .appbar{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 14px;box-shadow:0 8px 30px rgba(37,99,235,.10);position:sticky;top:10px;z-index:10}
+    .appbar .row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand .ttl{font-size:1.2rem;font-weight:750;letter-spacing:.02em;background:var(--gradient);color:#fff;padding:4px 12px;border-radius:10px;}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.nav{margin-bottom:16px;position:relative;top:0}}
+    .nav{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .nav h3{font-size:.95rem;margin:.25rem 0 .5rem;color:#1a7fd4;font-weight:700}
+    .nav a{display:block;padding:10px 12px;margin:6px 0;color:var(--ink);text-decoration:none;border-radius:10px;font-weight:500}
+    .nav a:hover{background:#eff8ff;border:1px dashed #a0c8f0;color:#1a7fd4}
+    .page{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;box-shadow:0 16px 40px rgba(26,127,212,.12)}
+    .wrap{max-width:720px}
+    h1{font-size:1.75rem;margin:.2rem 0 .6rem;color:#1a7fd4;font-weight:800}
+    h2{font-size:1.2rem;margin:1.6rem 0 .45rem;color:#1a7fd4;font-weight:700}
+    .emoji-list{padding:0;list-style:none}
+    .emoji-list li{position:relative;padding-left:1.6em;margin:.4rem 0}
+    .emoji-list li::before{content:attr(data-emoji);position:absolute;left:0;color:#1a7fd4;font-size:.9em;line-height:2;}
+    .footer{color:var(--muted);font-size:.92rem;margin-top:20px;text-align:center}
+    .copyright-pill{display:block;margin-top:8px;background:#eff8ff;border:2px solid #40a8f0;color:#1a7fd4;font-weight:800;border-radius:999px;padding:6px 16px;font-size:.9rem;text-align:center;}
+    .back-home{display:inline-flex;align-items:center;gap:.5em;background:#eff8ff;color:#1a7fd4;border:1.5px solid #40a8f0;padding:8px 12px;border-radius:10px;font-weight:700;text-decoration:none}
+    .back-home:hover{background:#dbeeff}
+
+    /* ── ヒントボックス ── */
+    .hint-box{background:linear-gradient(135deg,#eff8ff,#dbeeff);border:2px solid #40a8f0;border-radius:12px;padding:14px 18px;margin:12px 0 16px;}
+    .hint-box .hint-title{color:#1a7fd4;font-weight:800;font-size:.97rem;margin-bottom:6px}
+
+    /* ── 注意ボックス ── */
+    .caution-box{background:#fffbeb;border:2px solid #fbbf24;border-radius:12px;padding:14px 18px;margin:10px 0}
+    .caution-box .caution-title{color:#b45309;font-weight:800;font-size:1rem;margin-bottom:6px}
+
+    /* ── セクション区切り ── */
+    .section-label{display:inline-flex;align-items:center;gap:8px;background:var(--gradient);color:#fff;font-weight:800;font-size:.95rem;border-radius:999px;padding:5px 16px;margin:18px 0 10px;}
+
+    /* ── ステップリスト ── */
+    .step-list{list-style:none;padding:0;margin:12px 0 0;counter-reset:steps}
+    .step-list li{counter-increment:steps;display:flex;align-items:flex-start;gap:12px;padding:12px 14px;margin-bottom:10px;background:#f7fbff;border:1px solid #b6d9f5;border-radius:12px;}
+    .step-list li::before{content:counter(steps);min-width:28px;height:28px;border-radius:50%;background:var(--gradient);color:#fff;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+    .step-list li .step-body{flex:1}
+    .step-list li .step-title{font-weight:700;color:#0284c7;margin-bottom:3px}
+    .step-list li .step-desc{font-size:.93rem;color:#344;line-height:1.65}
+    .step-list li .step-hint{display:inline-block;margin-top:5px;background:#eff8ff;border:1px dashed #40a8f0;color:#1a7fd4;font-size:.82rem;border-radius:8px;padding:3px 9px}
+
+    /* ── NG/OK 比較カード ── */
+    .compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 16px;}
+    @media(max-width:640px){.compare-wrap{grid-template-columns:1fr}}
+    .compare-card{border-radius:12px;padding:14px 16px;}
+    .compare-card.ng{background:#fff5f5;border:2px solid #fca5a5;}
+    .compare-card.ok{background:#f0fdf4;border:2px solid #6ee7b7;}
+    .compare-card .compare-label{font-weight:800;font-size:.95rem;margin-bottom:8px;}
+    .compare-card.ng .compare-label{color:#dc2626;}
+    .compare-card.ok .compare-label{color:#059669;}
+    .compare-card .compare-text{font-size:.9rem;color:#1a2233;background:#fff;border-radius:8px;padding:10px 12px;line-height:1.7;white-space:pre-wrap;}
+    .compare-card .compare-reason{font-size:.82rem;margin-top:8px;padding:6px 10px;border-radius:8px;}
+    .compare-card.ng .compare-reason{background:#fee2e2;color:#991b1b;}
+    .compare-card.ok .compare-reason{background:#d1fae5;color:#065f46;}
+
+    /* ── 要素カード（プロンプトの構成要素） ── */
+    .element-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:12px 0 16px;}
+    .element-card{background:#f7fbff;border:1.5px solid #b6d9f5;border-radius:12px;padding:14px 14px;}
+    .element-card .el-icon{font-size:1.6rem;margin-bottom:4px;}
+    .element-card .el-name{font-weight:800;color:#0284c7;font-size:.97rem;margin-bottom:4px;}
+    .element-card .el-desc{font-size:.85rem;color:#5a6a88;line-height:1.55;}
+    .element-card .el-ex{font-size:.82rem;color:#1a2233;background:#eff8ff;border-radius:7px;padding:4px 8px;margin-top:6px;display:block;}
+
+    /* ── テンプレートカード（プロンプト例） ── */
+    .template-card{background:#f7fbff;border:1.5px solid #b6d9f5;border-radius:14px;padding:16px 18px;margin-bottom:14px;position:relative;}
+    .template-card .card-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+    .template-card .card-icon{font-size:1.4rem;}
+    .template-card .card-title{font-weight:800;color:#0284c7;font-size:1rem;}
+    .template-card .card-scene{font-size:.83rem;color:#5a6a88;background:#eff8ff;border:1px dashed #40a8f0;border-radius:8px;padding:2px 8px;margin-left:auto;white-space:nowrap;}
+    .prompt-label{font-size:.8rem;font-weight:700;color:#5a6a88;margin-bottom:4px;padding-left:2px;}
+    .prompt-label.ng-label{color:#dc2626;}
+    .prompt-label.ok-label{color:#059669;}
+    .card-prompt{background:#fff;border:1.5px dashed #40a8f0;border-radius:10px;padding:12px 14px;font-size:.92rem;color:#1a2233;white-space:pre-wrap;line-height:1.8;position:relative;margin-bottom:6px;}
+    .card-prompt.ng-prompt{border-color:#fca5a5;background:#fff5f5;}
+    .card-prompt.ok-prompt{border-color:#6ee7b7;background:#f0fdf4;}
+    .copy-btn{position:absolute;top:10px;right:10px;background:var(--gradient);color:#fff;border:none;border-radius:8px;padding:4px 12px;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s;}
+    .copy-btn:hover{opacity:.85;}
+    .copy-btn:active{opacity:.7;}
+    .card-tip{font-size:.82rem;color:#5a6a88;margin-top:8px;}
+    .card-tip span{color:#1a7fd4;font-weight:700;}
+    .arrow-down{text-align:center;font-size:1.5rem;margin:4px 0;color:#40a8f0;}
+
+    /* ── チェックリスト ── */
+    .checklist{list-style:none;padding:0;margin:8px 0;}
+    .checklist li{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;margin-bottom:6px;background:#f7fbff;border:1px solid #b6d9f5;border-radius:10px;font-size:.93rem;}
+    .checklist li .ck-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+    .checklist li .ck-text{flex:1;color:#1a2233;}
+    .checklist li .ck-text strong{color:#0284c7;}
+
+    /* ── 会話フロー ── */
+    .chat-flow{margin:12px 0 16px;}
+    .chat-bubble{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+    .chat-bubble.user{flex-direction:row-reverse;}
+    .chat-bubble .avatar{min-width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+    .chat-bubble.ai .avatar{background:var(--gradient);}
+    .chat-bubble.user .avatar{background:linear-gradient(135deg,#fef3c7,#fbbf24,#d97706);}
+    .chat-bubble .bubble{max-width:85%;padding:10px 14px;border-radius:14px;font-size:.91rem;line-height:1.65;}
+    .chat-bubble.ai .bubble{background:#eff8ff;border:1px solid #b6d9f5;border-top-left-radius:4px;}
+    .chat-bubble.user .bubble{background:linear-gradient(135deg,#e0f2fe,#bae6fd);border:1px solid #7dd3fc;border-top-right-radius:4px;}
+    .chat-bubble .bubble .speaker{font-size:.78rem;font-weight:700;margin-bottom:3px;}
+    .chat-bubble.ai .bubble .speaker{color:#1a7fd4;}
+    .chat-bubble.user .bubble .speaker{color:#b45309;}
+
+    /* ── バッジ ── */
+    .badge-good{background:#d1fae5;color:#065f46;border-radius:6px;padding:2px 7px;font-size:.82rem;font-weight:700;white-space:nowrap}
+    .badge-bad{background:#fee2e2;color:#991b1b;border-radius:6px;padding:2px 7px;font-size:.82rem;font-weight:700;white-space:nowrap}
+    .badge-mid{background:#fef9c3;color:#92400e;border-radius:6px;padding:2px 7px;font-size:.82rem;font-weight:700;white-space:nowrap}
+
+    /* ── 仕上げチェック表 ── */
+    .cmp-table{width:100%;border-collapse:collapse;margin:12px 0 4px;font-size:.93rem}
+    .cmp-table th{background:var(--gradient);color:#fff;padding:10px 12px;text-align:center;font-weight:700}
+    .cmp-table th:first-child{border-radius:10px 0 0 0}
+    .cmp-table th:last-child{border-radius:0 10px 0 0}
+    .cmp-table td{padding:9px 12px;border:1px solid #b6d9f5;vertical-align:top;background:#fff}
+    .cmp-table tr:last-child td:first-child{border-radius:0 0 0 10px}
+    .cmp-table tr:last-child td:last-child{border-radius:0 0 10px 0}
+    .cmp-table .feature-col{font-weight:600;color:#1a2233;width:40%}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── アプリバー ── -->
+  <div class="appbar" role="banner">
+    <div class="row">
+      <div class="brand">
+        <div class="ttl">🤖 AI‑Driven Quality. Powered by Oz. 🧩</div>
+      </div>
+      <div class="brand" style="gap:10px;">
+        <div style="font-size:.9rem;color:#4a4a4a;font-weight:600;">🌱 AIでできる事を広げよう！ ✨</div>
+        <a class="back-home" href="../index.html" aria-label="トップページに戻る">➡ 🏠</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ── サイドナビ ── -->
+    <nav class="nav" aria-label="ページ内メニュー">
+      <h3>📋 目次</h3>
+      <a href="#what">プロンプトってなに？</a>
+      <a href="#why-fails">うまく伝わらない理由</a>
+      <a href="#elements">プロンプトの5つの要素</a>
+      <a href="#ngok">NG→OK 比較で学ぼう</a>
+      <a href="#consult">「相談する」使い方</a>
+      <a href="#refine">もっとよくする会話術</a>
+      <a href="#checklist">送る前チェックリスト</a>
+      <a href="#caution">注意事項</a>
+      <a class="back-home" href="index.html" style="margin-top:10px;">🏠 トップページに戻る</a>
+    </nav>
+
+    <!-- ── メインコンテンツ ── -->
+    <main class="page">
+      <div class="wrap">
+
+        <div style="margin-bottom:.4rem;">
+          <h1 style="margin:0;">プロンプトの作り方ガイド ✍️</h1>
+          <p style="font-size:.95rem;color:#5a6a88;margin:.4rem 0 0;">「どう伝えればいいの？」に答えます｜初心者向け 完全ガイド</p>
+        </div>
+
+        <div class="hint-box" style="margin-top:14px;">
+          <div class="hint-title">🐣 このページでわかること</div>
+          <ul class="emoji-list">
+            <li data-emoji="✅">プロンプトってそもそも何？という基本</li>
+            <li data-emoji="✅">うまく伝わらない原因とその解決策</li>
+            <li data-emoji="✅">すぐ使えるプロンプトの「型」と具体例</li>
+            <li data-emoji="✅">AIと会話しながら改善していくコツ</li>
+          </ul>
+        </div>
+
+        <!-- ① プロンプトとは -->
+        <section id="what">
+          <div class="section-label">🤔 プロンプトってなに？</div>
+
+          <p style="font-size:.95rem;">
+            <strong>プロンプト</strong>とは、AIへの「お願い文」のことです。<br>
+            人間同士で言えば、上司に仕事を頼む時の「依頼メール」と同じイメージです。
+          </p>
+
+          <div class="compare-wrap">
+            <div class="compare-card ng">
+              <div class="compare-label">😅 あいまいな頼み方</div>
+              <div class="compare-text">メール書いて</div>
+              <div class="compare-reason">❌ 何のメール？誰に？何を伝える？が不明なので、的外れな回答が返ってきます</div>
+            </div>
+            <div class="compare-card ok">
+              <div class="compare-label">😊 具体的な頼み方</div>
+              <div class="compare-text">○○社の田中様への
+見積送付メールを
+300文字で書いて</div>
+              <div class="compare-reason">✅ 誰に・何を・どんな形式かが明確なので、すぐ使える文章が返ってきます！</div>
+            </div>
+          </div>
+
+          <div class="hint-box">
+            <div class="hint-title">💡 大切なのはたった1つ！</div>
+            <p style="margin:0;font-size:.93rem;">
+              AIは「察する」ことができません。<br>
+              <strong>人間の新入社員に仕事を説明するつもりで、具体的に書く</strong>のが一番のコツです🌟
+            </p>
+          </div>
+        </section>
+
+        <!-- ② うまく伝わらない理由 -->
+        <section id="why-fails">
+          <div class="section-label">😓 うまく伝わらない3つの理由</div>
+
+          <div class="element-grid" style="grid-template-columns:repeat(auto-fill,minmax(190px,1fr));">
+            <div class="element-card" style="border-color:#fca5a5;background:#fff5f5;">
+              <div class="el-icon">🌫️</div>
+              <div class="el-name" style="color:#dc2626;">① 目的があいまい</div>
+              <div class="el-desc">「何のために」使いたいかを伝えていない</div>
+              <span class="el-ex" style="background:#fee2e2;color:#991b1b;">× 「資料作って」<br>→ 何の資料？</span>
+            </div>
+            <div class="element-card" style="border-color:#fca5a5;background:#fff5f5;">
+              <div class="el-icon">🚫</div>
+              <div class="el-name" style="color:#dc2626;">② 条件・制約がない</div>
+              <div class="el-desc">文字数・形式・トーンなど「どうしてほしいか」が抜けている</div>
+              <span class="el-ex" style="background:#fee2e2;color:#991b1b;">× 「説明して」<br>→ 長さは？箇条書き？</span>
+            </div>
+            <div class="element-card" style="border-color:#fca5a5;background:#fff5f5;">
+              <div class="el-icon">👤</div>
+              <div class="el-name" style="color:#dc2626;">③ 読み手が不明</div>
+              <div class="el-desc">誰が読む・誰に向けた内容かを伝えていない</div>
+              <span class="el-ex" style="background:#fee2e2;color:#991b1b;">× 「案内文作って」<br>→ 社内？社外？</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ③ 5つの要素 -->
+        <section id="elements">
+          <div class="section-label">🧩 プロンプトの5つの要素</div>
+
+          <p style="font-size:.93rem;color:#5a6a88;margin-bottom:4px;">
+            この5つを意識するだけで、AIへの伝わり方がグッと変わります！<br>全部入れなくてもOK。使えそうなものを選んで使ってみてください。
+          </p>
+
+          <div class="element-grid">
+            <div class="element-card">
+              <div class="el-icon">🎯</div>
+              <div class="el-name">① やってほしいこと</div>
+              <div class="el-desc">何をしてほしいかを最初に書く。一番大切な部分！</div>
+              <span class="el-ex">「〇〇の文章を作って」<br>「〇〇を要約して」<br>「〇〇を説明して」</span>
+            </div>
+            <div class="element-card">
+              <div class="el-icon">👥</div>
+              <div class="el-name">② 読み手・使う場面</div>
+              <div class="el-desc">誰が読む？どこで使う？を伝えるとピッタリな内容になる</div>
+              <span class="el-ex">「上司への報告用」<br>「取引先への社外向け」<br>「ITが苦手な社員向け」</span>
+            </div>
+            <div class="element-card">
+              <div class="el-icon">📝</div>
+              <div class="el-name">③ 背景・状況</div>
+              <div class="el-desc">なぜそれが必要か、今どんな状況かを添えると精度UP</div>
+              <span class="el-ex">「今月から制度が変わり…」<br>「先日の商談を受けて…」</span>
+            </div>
+            <div class="element-card">
+              <div class="el-icon">📐</div>
+              <div class="el-name">④ 形式・文字数</div>
+              <div class="el-desc">どんな形で返してほしいかを指定すると使いやすい！</div>
+              <span class="el-ex">「箇条書きで3点」<br>「300文字以内で」<br>「表形式で」</span>
+            </div>
+            <div class="element-card">
+              <div class="el-icon">🎭</div>
+              <div class="el-name">⑤ トーン・雰囲気</div>
+              <div class="el-desc">文体・口調のイメージを伝えると出力の質が変わる</div>
+              <span class="el-ex">「丁寧なビジネス文体で」<br>「やわらかい口調で」<br>「簡潔にシンプルに」</span>
+            </div>
+          </div>
+
+          <div class="hint-box">
+            <div class="hint-title">🌟 まとめると「型」はこれ！</div>
+            <div style="background:#fff;border:1.5px dashed #40a8f0;border-radius:10px;padding:14px 16px;font-size:.93rem;line-height:2;">
+              <strong style="color:#0284c7;">【やってほしいこと】</strong>を書いて、<br>
+              <strong style="color:#0284c7;">【読み手・使う場面】</strong>を添えて、<br>
+              <strong style="color:#0284c7;">【背景・状況】</strong>があれば入れて、<br>
+              <strong style="color:#0284c7;">【形式・文字数】</strong>と<strong style="color:#0284c7;">【トーン】</strong>で仕上げる！
+            </div>
+          </div>
+        </section>
+
+        <!-- ④ NG→OK比較 -->
+        <section id="ngok">
+          <div class="section-label">📊 NG→OK 比較で学ぼう</div>
+          <p style="font-size:.93rem;color:#5a6a88;margin-bottom:12px;">実際によくある「惜しいプロンプト」と「グッとよくなったプロンプト」を比べてみましょう！</p>
+
+          <!-- 例1 -->
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">✉️</span>
+              <span class="card-title">例①：お客様へのメール作成</span>
+              <span class="card-scene">営業・総務</span>
+            </div>
+            <div class="prompt-label ng-label">❌ NG プロンプト</div>
+            <div class="card-prompt ng-prompt">お客様へのメールを書いて</div>
+            <div class="arrow-down">⬇️ こう変えると…</div>
+            <div class="prompt-label ok-label">✅ OK プロンプト（コピーして使えます！）</div>
+            <div class="card-prompt ok-prompt" id="ex1">取引先の山田商事・佐藤様へのお礼メールを作成してください。
+
+■ 状況：先日の打ち合わせで新製品の提案をさせていただいた
+■ 伝えたいこと：ご時間をいただいたお礼と、次回の見積提示のご連絡
+■ 文体：丁寧なビジネスメール
+■ 文字数：200〜250文字程度</div>
+            <button class="copy-btn" onclick="copyTemplate('ex1',this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 改善ポイント：</span>「誰に」「どんな状況で」「何を伝えるか」「どんな形式か」を加えました。</div>
+          </div>
+
+          <!-- 例2 -->
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📋</span>
+              <span class="card-title">例②：会議の議事録まとめ</span>
+              <span class="card-scene">全職種共通</span>
+            </div>
+            <div class="prompt-label ng-label">❌ NG プロンプト</div>
+            <div class="card-prompt ng-prompt">議事録を書いて</div>
+            <div class="arrow-down">⬇️ こう変えると…</div>
+            <div class="prompt-label ok-label">✅ OK プロンプト（コピーして使えます！）</div>
+            <div class="card-prompt ok-prompt" id="ex2">以下の会議メモをもとに、議事録を作成してください。
+
+■ 会議名：〇〇プロジェクト定例会議
+■ 日時：〇月〇日
+■ 参加者：〇〇、〇〇、〇〇
+■ 会議メモ（ここに貼り付けてください）：
+---
+（メモ内容をここに貼る）
+---
+
+■ 出力形式：
+  ・決定事項（箇条書き）
+  ・次回のアクション＋担当者＋期限
+  ・その他共有事項</div>
+            <button class="copy-btn" onclick="copyTemplate('ex2',this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 改善ポイント：</span>出力の「形式」を指定することで、そのまま使える議事録が完成します。</div>
+          </div>
+
+          <!-- 例3 -->
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📣</span>
+              <span class="card-title">例③：社内向け案内文</span>
+              <span class="card-scene">人事・総務・情シス</span>
+            </div>
+            <div class="prompt-label ng-label">❌ NG プロンプト</div>
+            <div class="card-prompt ng-prompt">案内文を作って</div>
+            <div class="arrow-down">⬇️ こう変えると…</div>
+            <div class="prompt-label ok-label">✅ OK プロンプト（コピーして使えます！）</div>
+            <div class="card-prompt ok-prompt" id="ex3">全社員向けに「有給休暇取得推進」の案内文を作成してください。
+
+■ 背景：今期の有給取得率が目標を下回っているため、取得を促したい
+■ 伝えたいこと：計画的な有給取得のお願い、申請方法のリマインド
+■ 読み手：全社員（ITが得意でない方も多い）
+■ トーン：堅すぎず、親しみやすく
+■ 文字数：300文字以内</div>
+            <button class="copy-btn" onclick="copyTemplate('ex3',this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 改善ポイント：</span>「背景」と「読み手の特徴」を加えると、刺さる案内文になります。</div>
+          </div>
+
+          <!-- 例4 -->
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">🔍</span>
+              <span class="card-title">例④：資料・文章の要約</span>
+              <span class="card-scene">全職種共通</span>
+            </div>
+            <div class="prompt-label ng-label">❌ NG プロンプト</div>
+            <div class="card-prompt ng-prompt">要約して</div>
+            <div class="arrow-down">⬇️ こう変えると…</div>
+            <div class="prompt-label ok-label">✅ OK プロンプト（コピーして使えます！）</div>
+            <div class="card-prompt ok-prompt" id="ex4">以下の文章を要約してください。
+
+■ 目的：上司への5分報告で使いたい
+■ 要約の形式：
+  ・結論（1〜2文）
+  ・主要ポイント（箇条書き3点）
+  ・今後のアクション（1〜2文）
+■ 文字数：全体200文字以内
+
+---
+（ここに要約したい文章を貼り付けてください）
+---</div>
+            <button class="copy-btn" onclick="copyTemplate('ex4',this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 改善ポイント：</span>「何に使うか」と「出力の構成」を指定すると、そのまま使える要約になります。</div>
+          </div>
+
+          <!-- 例5 -->
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📊</span>
+              <span class="card-title">例⑤：アイデア出し・発想支援</span>
+              <span class="card-scene">企画・採用・研修</span>
+            </div>
+            <div class="prompt-label ng-label">❌ NG プロンプト</div>
+            <div class="card-prompt ng-prompt">アイデアちょうだい</div>
+            <div class="arrow-down">⬇️ こう変えると…</div>
+            <div class="prompt-label ok-label">✅ OK プロンプト（コピーして使えます！）</div>
+            <div class="card-prompt ok-prompt" id="ex5">社員の有給取得を促進するための施策アイデアを出してください。
+
+■ 背景：有給取得率が全社平均60%で、目標の80%に届いていない
+■ 条件：
+  ・コストをかけずに実施できる施策を優先
+  ・現場に負担をかけないもの
+  ・すぐに実行できるもの（1か月以内）
+■ 出力：アイデアを5つ、各アイデアに一言コメント付きで</div>
+            <button class="copy-btn" onclick="copyTemplate('ex5',this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 改善ポイント：</span>「条件」を加えると、実行可能な現実的なアイデアが返ってきます。</div>
+          </div>
+        </section>
+
+        <!-- ⑤ 「相談する」使い方 -->
+        <section id="consult">
+          <div class="section-label">💬 「相談する」使い方</div>
+          <p style="font-size:.93rem;color:#5a6a88;margin-bottom:8px;">
+            プロンプトが思いつかない時は、<strong>「相談するプロンプト」</strong>を使うのが超おすすめ！<br>
+            「何を書けばいいか教えて」とそのままAIに聞いてしまいましょう🙌
+          </p>
+
+          <!-- 相談プロンプト1 -->
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">🤝</span>
+              <span class="card-title">「プロンプトを一緒に考えて」と頼む</span>
+              <span class="card-scene">何でも使える！</span>
+            </div>
+            <div class="card-prompt" id="consult1">〇〇したいのですが、どんなプロンプトを書けばよいか教えてもらえますか？
+
+■ やりたいこと：〔例：取引先へのお礼メールを作りたい〕
+■ 困っていること：〔例：どんな情報を盛り込めばいいかわからない〕
+
+上手なプロンプトの例も一緒に提示してもらえると助かります。</div>
+            <button class="copy-btn" onclick="copyTemplate('consult1',this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「例も提示して」と一言添えると、すぐ使えるプロンプトを作ってくれます！</div>
+          </div>
+
+          <!-- 相談プロンプト2 -->
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">🛠️</span>
+              <span class="card-title">「このプロンプトを改善して」と頼む</span>
+              <span class="card-scene">初心者の定番技！</span>
+            </div>
+            <div class="card-prompt" id="consult2">以下のプロンプトをもっとよくしてほしいです。
+
+---
+（ここに今のプロンプトを貼り付けてください）
+---
+
+■ 改善してほしい点：〔例：もっと具体的な回答が返ってくるよう、もっと短く等〕
+■ 用途：〔例：上司への報告書作成に使いたい〕
+
+改善版のプロンプトを提案してもらえますか？</div>
+            <button class="copy-btn" onclick="copyTemplate('consult2',this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>自分のプロンプトをAIに添削してもらう、という使い方です！どんどん上達します。</div>
+          </div>
+
+          <!-- 相談プロンプト3 -->
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">❓</span>
+              <span class="card-title">「何を聞けばいいか教えて」と丸投げする</span>
+              <span class="card-scene">困った時の奥の手！</span>
+            </div>
+            <div class="card-prompt" id="consult3">〇〇について、Claudeにうまく質問するには何を伝えればよいですか？
+
+■ 状況：〔例：新入社員向けの研修スケジュールを考えたい〕
+■ 私のレベル：AIを使い始めたばかりで、どう聞けばいいかわからない
+
+質問の仕方を教えてもらえると助かります！</div>
+            <button class="copy-btn" onclick="copyTemplate('consult3',this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「何を聞けばいいかさえわからない」時の、最強の一手です🎯</div>
+          </div>
+        </section>
+
+        <!-- ⑥ もっとよくする会話術 -->
+        <section id="refine">
+          <div class="section-label">🔄 会話しながら改善していくコツ</div>
+          <p style="font-size:.93rem;color:#5a6a88;margin-bottom:8px;">
+            一発でベストな回答が返ってくることは少ないです。<strong>追加指示で育てる</strong>のが上手な使い方です！
+          </p>
+
+          <div class="chat-flow">
+            <div class="chat-bubble user">
+              <div class="avatar">🧑</div>
+              <div class="bubble">
+                <div class="speaker">あなた（最初の質問）</div>
+                取引先へのお礼メールを書いて
+              </div>
+            </div>
+            <div class="chat-bubble ai">
+              <div class="avatar">🤖</div>
+              <div class="bubble">
+                <div class="speaker">Claude</div>
+                〇〇様、先日はお時間をいただきありがとうございました。今後ともよろしくお願いいたします…（長め）
+              </div>
+            </div>
+            <div class="chat-bubble user">
+              <div class="avatar">🧑</div>
+              <div class="bubble">
+                <div class="speaker">あなた（追加指示①）</div>
+                もっと短く、150文字以内にして
+              </div>
+            </div>
+            <div class="chat-bubble ai">
+              <div class="avatar">🤖</div>
+              <div class="bubble">
+                <div class="speaker">Claude</div>
+                〇〇様、先日はありがとうございました。ご提案の件、来週中に見積をお送りします。引き続きよろしくお願いいたします。
+              </div>
+            </div>
+            <div class="chat-bubble user">
+              <div class="avatar">🧑</div>
+              <div class="bubble">
+                <div class="speaker">あなた（追加指示②）</div>
+                もう少し温かみのある表現にして
+              </div>
+            </div>
+            <div class="chat-bubble ai">
+              <div class="avatar">🤖</div>
+              <div class="bubble">
+                <div class="speaker">Claude 🎉</div>
+                〇〇様、先日は貴重なお時間をいただきありがとうございました！ご提案の件、来週中に見積をご用意してお送りします。どうぞよろしくお願いいたします。
+              </div>
+            </div>
+          </div>
+
+          <div class="hint-box">
+            <div class="hint-title">✨ 使える追加指示フレーズ集</div>
+            <div class="element-grid" style="gap:8px;margin:8px 0 0;">
+              <div class="element-card" style="padding:10px 12px;">
+                <div class="el-name" style="font-size:.87rem;">📏 長さを変える</div>
+                <span class="el-ex">「もっと短く〇文字以内で」<br>「もう少し詳しく書いて」</span>
+              </div>
+              <div class="element-card" style="padding:10px 12px;">
+                <div class="el-name" style="font-size:.87rem;">🎨 トーンを変える</div>
+                <span class="el-ex">「もっと丁寧に」<br>「もっとやわらかく」<br>「堅めのビジネス調で」</span>
+              </div>
+              <div class="element-card" style="padding:10px 12px;">
+                <div class="el-name" style="font-size:.87rem;">📐 形式を変える</div>
+                <span class="el-ex">「箇条書きにして」<br>「表形式で整理して」<br>「番号付きリストで」</span>
+              </div>
+              <div class="element-card" style="padding:10px 12px;">
+                <div class="el-name" style="font-size:.87rem;">🔁 作り直す</div>
+                <span class="el-ex">「別のパターンを3つ出して」<br>「最初から別のアプローチで」</span>
+              </div>
+              <div class="element-card" style="padding:10px 12px;">
+                <div class="el-name" style="font-size:.87rem;">🎯 内容を絞る</div>
+                <span class="el-ex">「〇〇の部分だけ書き直して」<br>「〇〇を強調して」</span>
+              </div>
+              <div class="element-card" style="padding:10px 12px;">
+                <div class="el-name" style="font-size:.87rem;">🧐 確認する</div>
+                <span class="el-ex">「この内容で合ってる？」<br>「改善できる点はある？」</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ⑦ 送る前チェックリスト -->
+        <section id="checklist">
+          <div class="section-label">✅ 送る前チェックリスト</div>
+          <p style="font-size:.93rem;color:#5a6a88;margin-bottom:8px;">プロンプトを送る前に、このリストを確認してみてください！</p>
+
+          <table class="cmp-table">
+            <thead>
+              <tr>
+                <th class="feature-col">チェック項目</th>
+                <th>確認ポイント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="feature-col">🎯 目的は明確？</td>
+                <td>「何をしてほしいか」が最初に書いてあるか</td>
+              </tr>
+              <tr>
+                <td class="feature-col">👥 読み手は書いた？</td>
+                <td>誰向けの内容か（社内・社外・上司・新入社員など）</td>
+              </tr>
+              <tr>
+                <td class="feature-col">📐 形式の指定は？</td>
+                <td>箇条書き・文章・表など、どう返してほしいか</td>
+              </tr>
+              <tr>
+                <td class="feature-col">📏 文字数の指定は？</td>
+                <td>長すぎ・短すぎを防ぐために文字数の目安を入れよう</td>
+              </tr>
+              <tr>
+                <td class="feature-col">🔒 個人情報はない？</td>
+                <td>氏名・住所・電話番号などを含めていないか確認！</td>
+              </tr>
+              <tr>
+                <td class="feature-col">🔒 機密情報はない？</td>
+                <td>社外秘・売上数値・人事情報などが入っていないか</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ⑧ 注意事項 -->
+        <section id="caution">
+          <h2>⚠️ 使う際の注意事項</h2>
+          <div class="caution-box">
+            <div class="caution-title">⚠️ 必ずご確認ください</div>
+            <ul class="emoji-list">
+              <li data-emoji="●">氏名・住所・電話番号・マイナンバーなどの<strong>個人情報は絶対に入力しない</strong></li>
+              <li data-emoji="●">社外秘・機密情報（売上数値・製品仕様・人事情報など）は入力しない</li>
+              <li data-emoji="●">AIの回答は誤りを含む場合があります。<strong>必ず人間が内容を確認</strong>してから使用してください</li>
+              <li data-emoji="●">法務・医療・税務など専門的な判断が必要な内容は、必ず専門家に最終確認を</li>
+              <li data-emoji="●">無償版には1日あたりの利用回数制限があります。重要な業務を優先して活用しましょう</li>
+            </ul>
+          </div>
+
+          <div class="hint-box" style="margin-top:14px;">
+            <div class="hint-title">🚀 まとめ：プロンプト上達の3ステップ</div>
+            <ol class="step-list" style="margin:0;">
+              <li>
+                <div class="step-body">
+                  <div class="step-title">まずはテンプレートをそのまま使う</div>
+                  <div class="step-desc">最初から自分で考えなくてOK！テンプレートをコピーして【　】を書き換えるだけでOKです🌱</div>
+                </div>
+              </li>
+              <li>
+                <div class="step-body">
+                  <div class="step-title">追加指示で育てることに慣れる</div>
+                  <div class="step-desc">「もっと短く」「トーンを変えて」と追加指示を送るうちに、コツがつかめてきます🌿</div>
+                </div>
+              </li>
+              <li>
+                <div class="step-body">
+                  <div class="step-title">5つの要素を意識して自分で書いてみる</div>
+                  <div class="step-desc">①やってほしいこと ②読み手 ③背景 ④形式 ⑤トーン を意識するだけで、オリジナルプロンプトが作れます🌳</div>
+                  <div class="step-hint">🎉 ここまで来たら「プロンプト使いこなし」認定です！</div>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <div class="footer">
+          <span class="copyright-pill"><strong>Powered by Oz</strong></span>
+        </div>
+
+      </div><!-- /.wrap -->
+    </main>
+
+  </div><!-- /.layout -->
+</div><!-- /.shell -->
+
+<script>
+function copyTemplate(id, btn) {
+  const el = document.getElementById(id);
+  let text = '';
+  el.childNodes.forEach(node => {
+    text += node.textContent;
+  });
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ コピーしました！';
+    btn.style.background = 'linear-gradient(135deg,#d1fae5,#34d399,#059669)';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+    }, 2000);
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    btn.textContent = '✅ コピーしました！';
+    setTimeout(() => { btn.textContent = '📋 コピー'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

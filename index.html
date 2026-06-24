@@ -1,0 +1,1123 @@
+﻿<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>🤖 OZ AI活用ポータル｜AIでできる事を広げよう！</title>
+<style>
+    /* =====================================================
+       CSS変数（カラーパレット・グラデーション定義）
+       カテゴリ追加時はここにグラデーション変数を足す
+    ===================================================== */
+    :root{
+      --bg:#eef1f7; --card:#ffffff; --ink:#1a2233; --muted:#5a6a88;
+      --brand:#1a7fd4; --accent:#40a8f0; --bd:#a0c8f0;
+      --gradient:linear-gradient(135deg,#e0f2fe,#38bdf8,#0284c7,#1e3a8a);        /* 青：AI基礎 */
+      --gradient-gold:linear-gradient(135deg,#fef9c3,#fde68a,#f59e0b,#b45309);   /* 金：安全ルール */
+      --gradient-green:linear-gradient(135deg,#d1fae5,#6ee7b7,#059669,#064e3b);  /* 緑：実践活用 */
+      --gradient-purple:linear-gradient(135deg,#ede9fe,#c4b5fd,#7c3aed,#3b0764); /* 紫：プロンプト */
+      --gradient-rose:linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899,#831843);   /* ピンク：Claude */
+      --gradient-orange:linear-gradient(135deg,#ffedd5,#fdba74,#ea580c,#7c2d12); /* 橙：画像リソース */
+    }
+    *{box-sizing:border-box}
+    html,body{
+      background:var(--bg);color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',Meiryo,sans-serif;
+      line-height:1.75;margin:0
+    }
+
+    /* =====================================================
+       共通レイアウト
+    ===================================================== */
+    .shell{max-width:1120px;margin:0 auto;padding:0 16px 40px}
+
+    /* =====================================================
+       ヘッダー（固定ナビゲーションバー）
+       ロゴ・タイトル・Claudeリンクを配置
+    ===================================================== */
+    .appbar{
+      background:var(--card);border:1px solid var(--bd);border-radius:14px;
+      padding:10px 14px;box-shadow:0 8px 30px rgba(37,99,235,.10);
+      position:sticky;top:10px;z-index:100;margin:16px 0 0
+    }
+    .appbar .row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img.logo{height:32px}
+    .brand .ttl{
+      font-size:1.15rem;font-weight:800;letter-spacing:.02em;
+      background:var(--gradient);color:#fff;padding:4px 14px;border-radius:10px
+    }
+    /* 当サイトについてボタン */
+    .btn-about{
+      display:inline-flex;align-items:center;gap:5px;
+      background:#eff8ff;color:#0284c7;border:1.5px solid #40a8f0;
+      border-radius:8px;padding:5px 12px;font-size:.82rem;font-weight:700;
+      text-decoration:none;transition:background .18s,box-shadow .18s;white-space:nowrap
+    }
+    .btn-about:hover{background:#dbeeff;box-shadow:0 2px 10px rgba(26,127,212,.2)}
+
+    /* =====================================================
+       HEROバナー
+    ===================================================== */
+    .hero{
+      position:relative;overflow:hidden;
+      background:linear-gradient(135deg,#0f2a5e,#1a5fb4,#0ea5e9,#38bdf8);
+      border-radius:20px;
+      padding:22px 32px 18px;
+      margin-top:20px;color:#fff
+    }
+    /* 背景の水玉パターン装飾 */
+    .hero::before{
+      content:'';position:absolute;inset:0;
+      background:
+        url("data:image/svg+xml,%3Csvg width='52' height='60' viewBox='0 0 52 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M26 0l26 15v30L26 60 0 45V15z' fill='none' stroke='%23ffffff' stroke-opacity='0.09' stroke-width='1'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.06' stroke-width='1'%3E%3Cpath d='M0 0h40v40H0z'/%3E%3C/g%3E%3C/svg%3E");
+      pointer-events:none
+    }
+    /* ヒーロー内 横4カラムレイアウト */
+    .hero-layout{
+      display:grid;
+      grid-template-columns:1fr auto auto auto;
+      column-gap:20px;row-gap:20px;
+      align-items:center;position:relative;z-index:1
+    }
+    /* きかく君：前カラムとの間隔をネガティブマージンで詰める */
+    .hero-mascot{ margin-left:-180px; }
+    /* 左：テキストエリア */
+    .hero-badge{
+      display:inline-block;background:rgba(255,255,255,.18);
+      border:1.5px solid rgba(255,255,255,.4);border-radius:999px;
+      padding:3px 14px;font-size:1.07rem;font-weight:700;margin-bottom:8px;
+      backdrop-filter:blur(4px)
+    }
+    .hero h1{
+      font-size:1.75rem;font-weight:900;margin:0 0 7px;
+      text-shadow:0 2px 12px rgba(0,0,0,.25);line-height:1.25
+    }
+    .hero p{font-size:.92rem;opacity:.92;margin:0 0 14px;line-height:1.6}
+
+    /* 検索バー（テキストエリア内） */
+    .search-box{
+      display:flex;align-items:center;
+      background:#fff;border:2px solid var(--accent);border-radius:12px;
+      overflow:hidden;box-shadow:0 4px 16px rgba(26,127,212,.15);
+      max-width:440px
+    }
+    .search-box input{
+      flex:1;border:none;outline:none;padding:10px 14px;
+      font-size:.93rem;color:var(--ink)
+    }
+    .search-box button{
+      background:var(--gradient);color:#fff;border:none;
+      padding:10px 16px;font-size:.9rem;font-weight:700;cursor:pointer;white-space:nowrap
+    }
+    .search-box button:hover{opacity:.9}
+
+    /* 中央：統計カード（縦並び）＋お知らせ/注意ボタン */
+    .hero-center{display:flex;flex-direction:column;gap:8px;flex-shrink:0;align-items:stretch}
+    .hero-stats{display:flex;flex-direction:column;gap:8px}
+    /* 統計カード：各カラフル */
+    .hero-stat{
+      border-radius:12px;padding:8px 18px;backdrop-filter:blur(6px);text-align:center;
+      border:1.5px solid rgba(255,255,255,.5)
+    }
+    .hero-stat-1{background:linear-gradient(135deg,rgba(99,102,241,.7),rgba(139,92,246,.8))} /* 紫：コンテンツ数 */
+    .hero-stat-2{background:linear-gradient(135deg,rgba(16,185,129,.7),rgba(5,150,105,.8))}  /* 緑：カテゴリ数 */
+    .hero-stat-3{background:linear-gradient(135deg,rgba(245,158,11,.7),rgba(239,68,68,.8))}  /* 金→赤：FREE */
+    .hero-stat .num{font-size:1.5rem;font-weight:900;display:block;line-height:1;color:#fff}
+    .hero-stat .lbl{font-size:.72rem;color:rgba(255,255,255,.9);font-weight:600}
+
+    /* お知らせ・注意事項 小ボタン（ヒーロー内） */
+    .hero-mini-btns{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+    .hero-mini-btn{
+      display:flex;align-items:center;gap:6px;
+      border-radius:8px;padding:6px 10px;font-size:.78rem;font-weight:700;
+      text-decoration:none;border:1.5px solid rgba(255,255,255,.4);
+      background:rgba(255,255,255,.12);color:#fff;
+      transition:background .18s,transform .18s;backdrop-filter:blur(4px);white-space:nowrap
+    }
+    .hero-mini-btn:hover{background:rgba(255,255,255,.25);transform:translateX(2px)}
+    .hero-mini-btn .btn-dot{
+      width:7px;height:7px;border-radius:50%;flex-shrink:0
+    }
+
+    /* 右：きかく君 ★2倍サイズ（height:260px） */
+    .hero-mascot{
+      height:260px;flex-shrink:0;
+      animation:float 3.5s ease-in-out infinite;
+      filter:drop-shadow(0 8px 24px rgba(0,0,0,.25))
+    }
+
+    /* レスポンシブ：タブレット以下 */
+    @media(max-width:1000px){
+      .hero-layout{grid-template-columns:1fr auto auto}
+      .hero-mascot{display:none}
+      .hero-ai-col{display:none}
+    }
+    @media(max-width:900px){
+      .hero-layout{grid-template-columns:1fr auto}
+      .hero-stats{flex-direction:row;flex-wrap:wrap}
+    }
+    @media(max-width:600px){
+      .hero h1{font-size:1.35rem}
+      .hero-layout{grid-template-columns:1fr}
+    }
+
+    /* =====================================================
+       セクションヘッダー
+    ===================================================== */
+    .sec-header{display:flex;align-items:center;gap:12px;margin:32px 0 14px}
+    .sec-header .sec-icon{
+      width:48px;height:48px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.6rem;flex-shrink:0
+    }
+    .sec-header h2{font-size:1.85rem;font-weight:800;color:var(--brand);margin:0}
+    .sec-header .sec-count{
+      background:#eff8ff;border:1.5px solid var(--accent);
+      color:var(--brand);border-radius:999px;padding:3px 14px;font-size:1.0rem;font-weight:700
+    }
+
+    /* =====================================================
+       カードグリッド（レスポンシブ自動折り返し）
+    ===================================================== */
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+    @media(max-width:600px){.card-grid{grid-template-columns:1fr}}
+
+    /* =====================================================
+       リンクカード（各ページへのリンク）
+    ===================================================== */
+    .lcard{
+      background:var(--card);border:1.5px solid var(--bd);border-radius:16px;
+      padding:16px 18px;text-decoration:none;color:var(--ink);
+      display:flex;flex-direction:column;gap:8px;
+      transition:transform .2s,box-shadow .2s,border-color .2s,background .2s;
+      position:relative;overflow:hidden
+    }
+    /* 上部カラーバー（カテゴリ色）*/
+    .lcard::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:4px;
+      border-radius:16px 16px 0 0;
+      transition:height .22s ease
+    }
+    /* ホバー時：バーを全面に展開して背景として使う */
+    .lcard:hover{transform:translateY(-5px)}
+    .lcard:hover::before{height:100%;z-index:0;border-radius:16px}
+
+    /* カード内要素をホバー時に前面へ・白に反転 */
+    .lcard > *{position:relative;z-index:1}
+    .lcard:hover .card-title{color:#fff !important}
+    .lcard:hover .card-desc{color:rgba(255,255,255,.88) !important}
+    .lcard:hover .card-arrow{color:#fff !important;transform:translateX(4px)}
+    .lcard:hover .card-tag{background:rgba(255,255,255,.25) !important;color:#fff !important;border-color:transparent !important}
+
+    .lcard .card-icon{font-size:1.6rem;line-height:1;transition:transform .2s;display:block}
+    .lcard:hover .card-icon{transform:scale(1.25)}
+    .lcard .card-title{font-weight:800;font-size:.97rem;color:var(--ink);line-height:1.4;transition:color .2s}
+    .lcard .card-desc{font-size:.82rem;color:var(--muted);line-height:1.5;flex:1;transition:color .2s}
+    .lcard .card-arrow{font-size:.8rem;color:var(--accent);font-weight:700;align-self:flex-end;margin-top:4px;transition:color .2s,transform .2s;display:block}
+    .lcard .card-tag{
+      display:inline-block;border-radius:6px;padding:1px 8px;
+      font-size:.74rem;font-weight:700;margin-bottom:2px;
+      transition:background .2s,color .2s
+    }
+
+    /* =====================================================
+       カテゴリ別カラー定義
+    ===================================================== */
+    /* 青：AI基礎知識 */
+    .cat-blue::before{background:var(--gradient)}
+    .cat-blue:hover{box-shadow:0 12px 36px rgba(26,127,212,.5);border-color:#0284c7}
+    .cat-blue .card-tag{background:#dbeeff;color:#0284c7}
+    /* 金：安全・ルール */
+    .cat-gold::before{background:var(--gradient-gold)}
+    .cat-gold:hover{box-shadow:0 12px 36px rgba(245,158,11,.5);border-color:#f59e0b}
+    .cat-gold .card-tag{background:#fef9c3;color:#b45309}
+    /* 緑：AI実践活用 */
+    .cat-green::before{background:var(--gradient-green)}
+    .cat-green:hover{box-shadow:0 12px 36px rgba(5,150,105,.5);border-color:#059669}
+    .cat-green .card-tag{background:#d1fae5;color:#065f46}
+    /* 紫：プロンプト技術 */
+    .cat-purple::before{background:var(--gradient-purple)}
+    .cat-purple:hover{box-shadow:0 12px 36px rgba(124,58,237,.5);border-color:#7c3aed}
+    .cat-purple .card-tag{background:#ede9fe;color:#5b21b6}
+    /* ピンク：Claude使い方 */
+    .cat-rose::before{background:var(--gradient-rose)}
+    .cat-rose:hover{box-shadow:0 12px 36px rgba(236,72,153,.5);border-color:#ec4899}
+    .cat-rose .card-tag{background:#fce7f3;color:#9d174d}
+    /* 橙：画像・リソース */
+    .cat-orange::before{background:var(--gradient-orange)}
+    .cat-orange:hover{box-shadow:0 12px 36px rgba(234,88,12,.5);border-color:#ea580c}
+    .cat-orange .card-tag{background:#ffedd5;color:#9a3412}
+
+    /* セクションアイコン背景色 */
+    .si-blue  {background:linear-gradient(135deg,#dbeeff,#93c5fd)}
+    .si-gold  {background:linear-gradient(135deg,#fef9c3,#fde68a)}
+    .si-green {background:linear-gradient(135deg,#d1fae5,#6ee7b7)}
+    .si-purple{background:linear-gradient(135deg,#ede9fe,#c4b5fd)}
+    .si-rose  {background:linear-gradient(135deg,#fce7f3,#f9a8d4)}
+    .si-orange{background:linear-gradient(135deg,#ffedd5,#fdba74)}
+
+    /* =====================================================
+       ピックアップカード（まずここから3枚）
+    ===================================================== */
+    .pickup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:6px}
+    .pickup-card{
+      background:var(--gradient);border-radius:18px;padding:18px 20px;
+      color:#fff;text-decoration:none;display:flex;align-items:center;gap:14px;
+      transition:transform .2s,box-shadow .2s,filter .2s;
+      box-shadow:0 8px 24px rgba(26,127,212,.25)
+    }
+    .pickup-card:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 18px 44px rgba(26,127,212,.45);filter:brightness(1.1)}
+    .pickup-card .p-icon{font-size:2rem;flex-shrink:0;transition:transform .2s}
+    .pickup-card:hover .p-icon{transform:scale(1.2)}
+    .pickup-card .p-body .p-label{font-size:.72rem;font-weight:700;opacity:.8;margin-bottom:2px}
+    .pickup-card .p-body .p-title{font-size:1rem;font-weight:800;line-height:1.3}
+    .pickup-card .p-arrow{margin-left:auto;font-size:1.2rem;flex-shrink:0;opacity:.8;transition:transform .2s}
+    .pickup-card:hover .p-arrow{transform:translateX(6px)}
+
+    /* =====================================================
+       注意バナー（セキュリティ・個人情報注意喚起）
+    ===================================================== */
+    .caution-banner{
+      background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px solid #fbbf24;
+      border-radius:14px;padding:14px 20px;display:flex;align-items:flex-start;gap:12px;margin:20px 0 0
+    }
+    .caution-banner .cb-icon{font-size:3.2rem;flex-shrink:0;margin-top:2px;line-height:1}
+    .caution-banner .cb-title{font-weight:800;color:#b45309;margin-bottom:4px}
+    .caution-banner .cb-body{font-size:.9rem;color:#78350f;line-height:1.65}
+
+    /* =====================================================
+       NEWバッジ（新着ページに貼るラベル）
+    ===================================================== */
+    .badge-new{
+      position:absolute;top:12px;right:12px;
+      background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;
+      font-size:.7rem;font-weight:800;border-radius:6px;padding:2px 7px;
+      box-shadow:0 2px 6px rgba(244,63,94,.4);z-index:2
+    }
+
+    /* 検索ゼロ件メッセージ */
+    .lcard.hidden{display:none}
+    .no-result{display:none;text-align:center;color:var(--muted);padding:24px;font-size:.97rem}
+    .no-result.show{display:block}
+
+    /* フッター */
+    .footer{color:var(--muted);font-size:.92rem;margin-top:32px;text-align:center}
+    .copyright-pill{
+      display:block;margin-top:8px;background:#eff8ff;border:2px solid #40a8f0;
+      color:#1a7fd4;font-weight:800;border-radius:999px;padding:6px 16px;font-size:.9rem;text-align:center
+    }
+
+    /* 浮遊アニメーション（きかく君） */
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+    /* =====================================================
+       AI クイックアクセスボタン（ヒーロー内・右端カラム）
+    ===================================================== */
+    .hero-ai-col{display:flex;flex-direction:column;gap:8px;flex-shrink:0;align-items:center}
+    .ai-quick-label{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;text-align:center;}
+    .ai-btn-row{display:flex;flex-direction:column;gap:10px;align-items:center}
+    .ai-qbtn{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+      width:64px;height:64px;border-radius:50%;
+      font-size:.7rem;font-weight:800;text-decoration:none;
+      border:2px solid rgba(255,255,255,.45);
+      backdrop-filter:blur(6px);
+      transition:transform .18s,box-shadow .18s,filter .18s;
+      letter-spacing:.01em;
+      box-shadow:0 3px 10px rgba(0,0,0,.22);
+      text-align:center;line-height:1.2
+    }
+    .ai-qbtn:hover{transform:scale(1.12);filter:brightness(1.18);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+    .ai-qbtn .ai-icon{font-size:1.4rem;line-height:1;display:block}
+    /* Claude：オレンジ系 */
+    .ai-qbtn.ai-claude{background:linear-gradient(135deg,rgba(234,88,12,.85),rgba(251,146,60,.85));color:#fff}
+    /* ChatGPT：グリーン系 */
+    .ai-qbtn.ai-chatgpt{background:linear-gradient(135deg,rgba(16,163,127,.85),rgba(52,211,153,.85));color:#fff}
+    /* Gemini：青→紫 */
+    .ai-qbtn.ai-gemini{background:linear-gradient(135deg,rgba(66,133,244,.85),rgba(168,85,247,.85));color:#fff}
+    /* Copilot：マイクロソフトブルー */
+    .ai-qbtn.ai-copilot{background:linear-gradient(135deg,rgba(0,120,212,.85),rgba(80,230,255,.85));color:#fff}
+  
+ /* Perplexity button (same circular style) */
+ .ai-qbtn.ai-perplexity{background:linear-gradient(135deg,rgba(17,24,39,.85),rgba(55,65,81,.85));color:#fff}
+ /* Keep row height compact with 2-column grid of 64px buttons */
+ .ai-btn-row{display:grid;grid-template-columns:repeat(2,64px);gap:8px;align-items:center;justify-items:center}
+ @media(min-width:1200px){.ai-btn-row{grid-template-columns:repeat(2,64px)}}
+ @media(max-width:1000px){.ai-btn-row{grid-template-columns:repeat(2,64px)}}
+ @media(max-width:600px){.ai-btn-row{grid-template-columns:repeat(2,64px)}}
+
+    /* =====================================================
+       What's New テロップバー（ヘッダー直下）
+    ===================================================== */
+    .whats-new-bar{
+      display:flex;align-items:center;
+      background:linear-gradient(90deg,#0f2a5e,#1a5fb4,#0ea5e9);
+      border-radius:10px;
+      margin:8px 0 0;
+      padding:0;
+      overflow:hidden;
+      height:34px;
+      box-shadow:0 4px 14px rgba(26,127,212,.22);
+    }
+    .wnb-label{
+      flex-shrink:0;
+      background:linear-gradient(135deg,#f43f5e,#e11d48);
+      color:#fff;font-size:.72rem;font-weight:800;
+      padding:0 14px;height:100%;
+      display:flex;align-items:center;
+      letter-spacing:.06em;white-space:nowrap;
+      gap:5px;
+    }
+    .wnb-track{
+      flex:1;overflow:hidden;position:relative;height:100%;
+    }
+    .wnb-inner{
+      display:flex;align-items:center;gap:0;
+      height:100%;
+      white-space:nowrap;
+      animation:ticker 13s linear infinite;
+    }
+    .wnb-track:hover .wnb-inner{animation-play-state:paused}
+    .wnb-item{
+      display:inline-flex;align-items:center;gap:7px;
+      color:#fff;text-decoration:none;
+      font-size:.78rem;font-weight:700;
+      padding:0 28px 0 0;
+      transition:opacity .18s;
+      opacity:.92;
+    }
+    .wnb-item:hover{opacity:1;text-decoration:underline}
+    .wnb-item .wnb-dot{
+      width:6px;height:6px;border-radius:50%;
+      background:#fbbf24;flex-shrink:0;
+    }
+    .wnb-sep{color:rgba(255,255,255,.35);padding:0 4px 0 0;font-size:.8rem}
+    @keyframes ticker{
+      0%  {transform:translateX(0)}
+      100%{transform:translateX(-50%)}
+    }
+    @media(max-width:600px){
+      .wnb-label{font-size:.65rem;padding:0 10px}
+      .wnb-item{font-size:.72rem}
+    }
+    /* =====================================================
+       What's New ドロワー（折りたたみ）
+    ===================================================== */
+    .wnd-wrap{margin:16px 0 0}
+    .wnd-toggle{
+      display:flex;align-items:center;gap:10px;width:100%;
+      background:linear-gradient(90deg,#0f2a5e,#1a5fb4,#0ea5e9);
+      border:none;border-radius:12px;padding:10px 18px;cursor:pointer;
+      color:#fff;font-size:.88rem;font-weight:800;
+      box-shadow:0 4px 14px rgba(26,127,212,.22);
+      transition:filter .18s, border-radius .2s;
+      text-align:left;
+    }
+    .wnd-toggle:hover{filter:brightness(1.12)}
+    .wnd-toggle.open{border-radius:12px 12px 0 0}
+    .wnd-toggle .wnd-badge{
+      background:linear-gradient(135deg,#f43f5e,#e11d48);
+      font-size:.7rem;padding:2px 9px;border-radius:999px;
+      font-weight:800;flex-shrink:0;
+    }
+    .wnd-toggle .wnd-chevron{
+      margin-left:auto;font-size:1rem;
+      transition:transform .25s;flex-shrink:0;
+    }
+    .wnd-toggle.open .wnd-chevron{transform:rotate(180deg)}
+    .wnd-body{
+      display:none;
+      background:#fff;border:1.5px solid #a0c8f0;
+      border-top:none;border-radius:0 0 12px 12px;
+      overflow:hidden;
+    }
+    .wnd-body.open{display:block}
+    .wnd-list{list-style:none;margin:0;padding:10px 0}
+    .wnd-list li{border-bottom:1px solid #eef1f7}
+    .wnd-list li:last-child{border-bottom:none}
+    .wnd-list a{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 20px;text-decoration:none;color:var(--ink);
+      font-size:.88rem;font-weight:700;
+      transition:background .15s;
+    }
+    .wnd-list a:hover{background:#eff8ff}
+    .wnd-list .wnd-item-icon{font-size:1.2rem;flex-shrink:0}
+    .wnd-list .wnd-item-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:linear-gradient(135deg,#f43f5e,#e11d48);flex-shrink:0;
+    }
+    .wnd-list .wnd-item-arrow{margin-left:auto;color:var(--accent);font-size:.8rem;font-weight:700}
+    .wnd-list .wnd-item-date{
+      font-size:.75rem;color:var(--muted);font-weight:600;
+      flex-shrink:0;white-space:nowrap;margin-left:6px;
+    }
+</style>
+</head>
+<body>
+<div class="shell">
+<!-- =====================================================
+       ヘッダーナビゲーションバー
+  ===================================================== -->
+<header>
+<div class="appbar" role="banner">
+<div class="row">
+<!-- 左：サイトタイトル -->
+<div class="brand">
+<div class="ttl">🤖 AI-Driven Quality. Powered by Oz. 🧩</div>
+</div>
+<!-- 右：サブキャッチ＋当サイトについて＋50周年ロゴ＋Claudeロゴ -->
+<div class="brand" style="gap:10px;">
+<div style="font-size:.9rem;color:#4a4a4a;font-weight:600;">🌱 AIで業務改善！✨</div>
+<a class="btn-about" href="pages/About_Me.html">✏️About Me</a>
+<a href="https://claude.ai" rel="noopener" target="_blank" title="Claude公式サイト">
+<img alt="Claude ロゴ" class="logo" src="assets/Claude-Logo.png"/>
+</a>
+</div>
+</div>
+</div>
+</header>
+<!-- =====================================================
+     What's New テロップバー（NEWバッジページを自動収集してスクロール表示）
+===================================================== -->
+<div class="whats-new-bar" id="whatsNewBar" style="display:none">
+  <div class="wnb-label">🆕 What's New</div>
+  <div class="wnb-track">
+    <div class="wnb-inner" id="wnbInner"><!-- JSで生成 --></div>
+  </div>
+</div>
+<script>
+(function(){
+  // DOMContentLoaded より先に実行できるよう即時関数で
+  // ただしカードはまだないのでDOMContentLoaded後に実行
+  document.addEventListener('DOMContentLoaded', function(){
+    const bar    = document.getElementById('whatsNewBar');
+    const inner  = document.getElementById('wnbInner');
+
+    // badge-new を持つ .lcard を全件取得
+    const newCards = Array.from(document.querySelectorAll('.lcard .badge-new'))
+      .map(badge => badge.closest('.lcard'))
+      .filter(Boolean);
+
+    if(!newCards.length){ return; } // 0件なら非表示のまま
+
+    // 各カードからタイトル・リンクを抽出してアイテム生成（×2でループ見せ）
+    const items = newCards.map(card => ({
+      title : (card.querySelector('.card-title')?.textContent || '').replace(/\n/g,' ').trim(),
+      icon  : card.querySelector('.card-icon')?.textContent.trim() || '📄',
+      href  : card.getAttribute('href') || '#'
+    }));
+
+    // 2セット分作ってシームレスループ
+    const html = [...items, ...items].map((it, i) =>
+      `<a class="wnb-item" href="${it.href}">
+        <span class="wnb-dot"></span>${it.icon} ${it.title}
+       </a><span class="wnb-sep">｜</span>`
+    ).join('');
+
+    inner.innerHTML = html;
+    bar.style.display = 'flex';
+
+    // アイテム数に応じてアニメーション速度を調整（多いほど遅め）
+    const speed = Math.max(10, items.length * 3);
+    inner.style.animationDuration = speed + 's';
+  });
+})();
+</script>
+<!-- =====================================================
+       HEROバナー
+  ===================================================== -->
+<section aria-label="ポータル紹介" class="hero">
+<div class="hero-layout">
+<!-- 左カラム：キャッチコピー・説明・検索バー -->
+<div class="hero-text">
+<div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:8px;">
+<div class="hero-badge" style="margin-bottom:0;">✨ 無償ID利用時 暫定活用ポータル🚀 </div>
+<span style="display:inline-block;background:linear-gradient(135deg,#fce7f3,#f9a8d4,#ec4899);color:#fff;font-size:.6rem;font-weight:800;letter-spacing:.07em;padding:3px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(236,72,153,.4);white-space:nowrap;border:1.5px solid rgba(255,255,255,.55);">Fundamentals</span>
+</div>
+<h1>🤖 AIと一緒に、<br/>🎉 仕事をもっと楽しく！</h1><br/>
+<p>● AI初心者・初級者向け♪<br/>
+	● AIの使い方など、最初わからない事はみんなだいたい同じ。<br/>
+	● 気になるページをクリックしてちょっとずつ身につけよう！</p><br/>
+<!-- 検索バー：入力するとリアルタイムでカードを絞り込む -->
+<div class="search-box">
+<input id="searchInput" oninput="doSearch()" placeholder="🔍 キーワードで探す（例：プロンプト、Claude、注意…）" type="text"/>
+<button onclick="doSearch()">検索</button>
+</div>
+</div>
+<!-- 右カラム：きかく君マスコット（2倍サイズ・浮遊アニメ） -->
+<img alt="きかく君" class="hero-mascot" src="assets/きかく君_Standard.png"/>
+<!-- AIクイックアクセスボタン（きかく君の右）-->
+<div class="hero-ai-col">
+<div class="ai-quick-label">🚀 AIを開く</div>
+<div class="ai-btn-row">
+<a class="ai-qbtn ai-claude" href="https://claude.ai" rel="noopener" target="_blank">
+<span class="ai-icon">🟠</span>Claude
+          </a>
+<a class="ai-qbtn ai-chatgpt" href="https://chat.openai.com" rel="noopener" target="_blank">
+<span class="ai-icon">🟢</span>ChatGPT
+          </a>
+<a class="ai-qbtn ai-gemini" href="https://gemini.google.com" rel="noopener" target="_blank">
+<span class="ai-icon">🔷</span>Gemini
+          </a>
+<a class="ai-qbtn ai-copilot" href="https://copilot.microsoft.com" rel="noopener" target="_blank">
+<span class="ai-icon">🔵</span>Copilot
+          </a>
+<a class="ai-qbtn ai-perplexity" href="https://www.perplexity.ai" rel="noopener" target="_blank"><span class="ai-icon">🟤</span>Perplexity</a></div>
+</div>
+<!-- 統計カード＋お知らせ/注意事項ボタン -->
+<div class="hero-center">
+<div class="hero-stats">
+<div class="hero-stat hero-stat-1"><span class="num">36</span><span class="lbl">コンテンツ</span></div>
+<div class="hero-stat hero-stat-2"><span class="num">6</span><span class="lbl">カテゴリ</span></div>
+<div class="hero-stat hero-stat-3"><span class="num">2602</span><span class="lbl">入門・基礎</span></div>
+</div>
+<div class="hero-mini-btns">
+<a class="hero-mini-btn" href="pages/AIツール比較ガイド2026.html">
+<span class="btn-dot" style="background:#fbbf24;"></span>  ＡＩ比較 📢
+          </a>
+<a class="hero-mini-btn" href="pages/注意事項.html">
+<span class="btn-dot" style="background:#f87171;"></span>  注意事項 ⚠️
+          </a>
+</div>
+</div>
+</div>
+</section>
+<!-- =====================================================
+     What's New ドロワー（NEWバッジページを折りたたみ表示）
+===================================================== -->
+<div class="wnd-wrap" id="wndWrap" style="display:none">
+  <button class="wnd-toggle" id="wndToggle" onclick="toggleDrawer()" aria-expanded="false">
+    <span>🆕 What's New</span>
+    <span class="wnd-badge" id="wndCount"></span>
+    <span style="font-size:.8rem;opacity:.8;font-weight:600">― 新着ページ一覧</span>
+    <span class="wnd-chevron">▼</span>
+  </button>
+  <div class="wnd-body" id="wndBody" role="region">
+    <ul class="wnd-list" id="wndList"><!-- JSで生成 --></ul>
+  </div>
+</div>
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const wrap  = document.getElementById('wndWrap');
+    const list  = document.getElementById('wndList');
+    const count = document.getElementById('wndCount');
+
+    const newCards = Array.from(document.querySelectorAll('.lcard .badge-new'))
+      .map(b => b.closest('.lcard')).filter(Boolean);
+
+    if(!newCards.length){ return; }
+
+    const items = newCards.map(card => ({
+      title: (card.querySelector('.card-title')?.textContent || '').replace(/\n/g,' ').trim(),
+      icon : card.querySelector('.card-icon')?.textContent.trim() || '📄',
+      href : card.getAttribute('href') || '#'
+    }));
+
+    list.innerHTML = items.map(it =>
+      `<li><a href="${it.href}">
+        <span class="wnd-item-dot"></span>
+        <span class="wnd-item-date">2026/03/09</span>
+        <span class="wnd-item-icon">${it.icon}</span>
+        <span>${it.title}</span>
+        <span class="wnd-item-arrow">読む →</span>
+      </a></li>`
+    ).join('');
+
+    count.textContent = items.length + '件';
+    wrap.style.display = 'block';
+  });
+})();
+
+function toggleDrawer(){
+  const toggle = document.getElementById('wndToggle');
+  const body   = document.getElementById('wndBody');
+  const isOpen = toggle.classList.toggle('open');
+  body.classList.toggle('open', isOpen);
+  toggle.setAttribute('aria-expanded', isOpen);
+}
+</script>
+<!-- =====================================================
+       ピックアップ（まずここから読んでほしい3ページ）
+  ===================================================== -->
+<section aria-label="ピックアップ">
+<div class="sec-header">
+<div class="sec-icon si-gold">🌟</div>
+<h2>まずここから読もう！ ピックアップ</h2>
+</div>
+<div class="pickup-grid">
+<!-- ピックアップ①：AIを使う心構え -->
+<a class="pickup-card" href="Pages/AIを使う心構え.html" style="background:var(--gradient)">
+<div class="p-icon">🧠</div>
+<div class="p-body">
+<div class="p-label">まず最初に</div>
+<div class="p-title">AIを使う心構え</div>
+</div>
+<div class="p-arrow">→</div>
+</a>
+<!-- ピックアップ②：Claude（無償版）の使い方 -->
+<a class="pickup-card" href="Pages/Claude_無償版_の使い方.html" style="background:var(--gradient-rose)">
+<div class="p-icon">🚀</div>
+<div class="p-body">
+<div class="p-label">はじめてのClaude</div>
+<div class="p-title">Claude（無償版）の使い方</div>
+</div>
+<div class="p-arrow">→</div>
+</a>
+<!-- ピックアップ③：プロンプトって何？ -->
+<a class="pickup-card" href="Pages/プロンプトって何_.html" style="background:var(--gradient-purple)">
+<div class="p-icon">✍️</div>
+<div class="p-body">
+<div class="p-label">基本を覚えよう</div>
+<div class="p-title">プロンプトって何？</div>
+</div>
+<div class="p-arrow">→</div>
+</a>
+</div>
+</section>
+<!-- 注意バナー（個人情報・セキュリティ警告） -->
+<div class="caution-banner" role="alert">
+<div class="cb-icon">⚠️</div>
+<div>
+<div class="cb-title">情報入力には注意しましょう</div>
+<div class="cb-body">個人情報・社外秘・機密情報はAIに入力しないでください。<br/>
+	入力内容がAIの学習データに使われる可能性があります。
+	重要な判断は必ず人間が確認してください。</div>
+</div>
+</div>
+<!-- =====================================================
+       カテゴリ① AI基礎知識（青）
+       現在：7ページ
+  ===================================================== -->
+<section aria-label="AI基礎知識">
+<div class="sec-header">
+<div class="sec-icon si-blue">📖</div>
+<h2>AI基礎知識</h2>
+<span class="sec-count">8ページ</span>
+</div>
+<div class="card-grid">
+<!-- AI基礎①：AIを使う心構え -->
+<a class="lcard cat-blue" data-keywords="心構え 準備 基礎 はじめて" href="Pages/AIを使う心構え.html">
+<div class="card-tag">必読</div>
+<div class="card-icon">🧠</div>
+<div class="card-title">AIを使う心構え</div>
+<div class="card-desc">AI活用を始める前に知っておきたい考え方・姿勢をわかりやすく解説。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- プロンプト②：AI初心者が絶対覚えるべき5つの質問 -->
+<a class="lcard cat-blue" data-keywords="初心者 覚える 質問 5つ" href="Pages/AI初心者が絶対覚えるべき5つの質問.html">
+<div class="card-tag">必修</div>
+<div class="card-icon">😊</div>
+<div class="card-title">AI初心者が絶対覚えるべき5つの質問</div>
+<div class="card-desc">これだけ覚えれば何でも引き出せる！最強の5つの質問パターンを紹介。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 実践①：日常生活でのAIの使い方 -->
+<a class="lcard cat-blue" data-keywords="日常 生活 具体例 使い方 アイデア" href="Pages/日常生活でのAIの使い方.html">
+<div class="card-tag">生活</div>
+<div class="card-icon">🌅</div>
+<div class="card-title">日常生活でのAIの使い方</div>
+<div class="card-desc">仕事以外でもこんなに使える！日常シーンでのAI活用アイデアを大公開。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- AI基礎③：AIが苦手なこと10選 -->
+<a class="lcard cat-blue" data-keywords="苦手 できない 弱点 限界" href="Pages/AIが苦手なこと10選.html">
+<div class="card-tag">注意</div>
+<div class="card-icon">🙅</div>
+<div class="card-title">AIが苦手なこと10選</div>
+<div class="card-desc">「AIなら何でもできる」は誤解！苦手分野を知って期待値を正しくセットしよう。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- プロンプト②：プロンプトの作り方（基礎） -->
+<a class="lcard cat-blue" data-keywords="プロンプト 作り方 基礎 書き方" href="Pages/プロンプトの作り方_基礎_.html">
+<div class="card-tag">基礎</div>
+<div class="card-icon">🔨</div>
+<div class="card-title">プロンプトの作り方（基礎）</div>
+<div class="card-desc">伝わるプロンプトの型と書き方を基礎からわかりやすくステップで解説。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- AI基礎⑦：AIと仲良くなろう！ -->
+<a class="lcard cat-blue" data-keywords="仲良く コツ 付き合い方 活用" href="Pages/AIと仲良くなろう_.html">
+<div class="card-tag">入門</div>
+<div class="card-icon">🤝</div>
+<div class="card-title">AIと仲良くなろう！</div>
+<div class="card-desc">AIと上手に付き合うためのコツや心がまえを初心者向けにやさしく紹介。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 安全⑥：そのまま使えるテンプレート集（初心者） -->
+<a class="lcard cat-blue" data-keywords="テンプレート そのまま コピー 初心者 安全" href="Pages/そのまま使えるテンプレート集_初心者_.html">
+<div class="card-tag">テンプレ</div>
+<div class="card-icon">📋</div>
+<div class="card-title">そのまま使えるテンプレート集（初心者）</div>
+<div class="card-desc">コピペで使えるプロンプトを業務シーン別にまとめました。今すぐ使える！</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- Claude④：AI超初心者向け_試してみたい質問ベスト10 -->
+<a class="lcard cat-blue" data-keywords="試してみる 質問 練習 初心者 10問" href="Pages/AI超初心者向け_試してみたい質問ベスト10.html">
+<div class="card-tag">体験</div>
+<div class="card-icon">🎯</div>
+<div class="card-title">AI超初心者向け 試してみたい質問ベスト10</div>
+<div class="card-desc">「こんなこと聞いていいの？」実際の回答例付きのお試し質問集！</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+</div>
+</section>
+<!-- =====================================================
+       カテゴリ② Claude使い方ガイド（ピンク）
+       現在：8ページ
+  ===================================================== -->
+<section aria-label="Claude使い方ガイド">
+<div class="sec-header">
+<div class="sec-icon si-rose">🤖</div>
+<h2>Claude 使い方ガイド</h2>
+<span class="sec-count">8ページ</span>
+</div>
+<div class="card-grid">
+<!-- Claude①：Claude（無償版）の使い方 -->
+<a class="lcard cat-rose" data-keywords="Claude 無償版 ログイン 使い方" href="Pages/Claude_無償版_の使い方.html">
+<div class="card-tag">入門</div>
+<div class="card-icon">🚀</div>
+<div class="card-title">Claude（無償版）の使い方</div>
+<div class="card-desc">アカウント登録からログイン、初めての会話まで画面付きでやさしく解説。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- Claude②：Claudeの画面・機能ガイド -->
+<a class="lcard cat-rose" data-keywords="Claude 画面 機能 操作方法" href="Pages/Claudeの画面_機能ガイド.html">
+<div class="card-tag">操作</div>
+<div class="card-icon">🖥️</div>
+<div class="card-title">Claudeの画面・機能ガイド</div>
+<div class="card-desc">各ボタンの役割・設定項目・便利な機能を画面ごとに丁寧に説明。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- AI基礎②：5大AI比較・使い分けガイド -->
+<a class="lcard cat-rose" data-keywords="比較 ChatGPT Gemini Copilot Claude 5大" href="Pages/5大AI比較_使い分けガイド.html">
+<div class="card-tag">比較</div>
+<div class="card-icon">⚖️</div>
+<div class="card-title">5大AI比較・使い分けガイド</div>
+<div class="card-desc">ChatGPT・Claude・Gemini・Copilot・Perplexity、何が違う？目的別の使い分けを一覧で確認。</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+<!-- Claude③：Claude（無償版）のファイル添付制限 -->
+<a class="lcard cat-rose" data-keywords="Claude ファイル 添付 制限 PDF" href="Pages/Claude_無償版_のファイル添付制限.html">
+<div class="card-tag">制限</div>
+<div class="card-icon">📎</div>
+<div class="card-title">Claude（無償版）のファイル添付制限</div>
+<div class="card-desc">PDFや画像の添付はどこまでOK？無償版の制限と回避策を整理。</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+<!-- Claude③：Coworkってなに_ -->
+<a class="lcard cat-rose" data-keywords="Coworkってなに？_" href="Pages/Coworkってなに_.html">
+<span class="badge-new">NEW</span>
+<div class="card-tag">新機能</div>
+<div class="card-icon">💬</div>
+<div class="card-title">Coworkってなに？やさしい入門ガイド</div>
+<div class="card-desc">2026年02月に登場した新機能をカンタンに解説します。</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+<!-- Claude③：Coworkでできること具体例 -->
+<a class="lcard cat-rose" data-keywords="Coworkでできること具体例" href="Pages/Coworkでできること具体例.html">
+<span class="badge-new">NEW</span>
+<div class="card-tag">具体例</div>
+<div class="card-icon">🌱</div>
+<div class="card-title">Coworkでできること具体例ガイド</div>
+<div class="card-desc">Coworkの3つの力：①ファイル直接読書 ②複数ステップをまとめ ③ブラウザ操作も！</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+<!-- Claude③：Cowork_複合ワークフロー詳細 -->
+<a class="lcard cat-rose" data-keywords="Cowork_複合ワークフロー詳細" href="Pages/Cowork_複合ワークフロー詳細.html">
+<span class="badge-new">NEW</span>
+<div class="card-tag">実務・具体例詳細</div>
+<div class="card-icon">🔁</div>
+<div class="card-title">Cowork_複合ワークフロー  超詳細ガイド</div>
+<div class="card-desc">「複合ワークフロー」の3つの事例を、
+入力データ・各ステップの処理・出力イメージ（表・グラフ・メール等）まで細かく解説！</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+<!-- Claude③：Claudeの学習設定オフにする方法 -->
+<a class="lcard cat-rose" data-keywords="Claudeの学習設定オフにする方法" href="Pages/Claudeの学習設定オフにする方法.html">
+<span class="badge-new">NEW</span>
+<div class="card-tag">セキュリティ</div>
+<div class="card-icon">🛡️</div>
+<div class="card-title">Claudeの学習設定を「OFF」にする方法</div>
+<div class="card-desc">「Claudeに入力した内容をAIの学習に使わない設定」をやさしく説明します。 </div>
+<div class="card-arrow">読む →</div>
+</a>
+
+
+</div>
+</section>
+<!-- =====================================================
+       カテゴリ③ プロンプト技術を磨こう（紫）
+       現在：7ページ
+  ===================================================== -->
+<section aria-label="プロンプト技術">
+<div class="sec-header">
+<div class="sec-icon si-purple">✍️</div>
+<h2>プロンプト技術を磨こう</h2>
+<span class="sec-count">6ページ</span>
+</div>
+<div class="card-grid">
+<!-- プロンプト①：プロンプトって何？ -->
+<a class="lcard cat-purple" data-keywords="プロンプト 指示 書き方 基礎 入門" href="Pages/プロンプトって何_.html">
+<div class="card-tag">入門</div>
+<div class="card-icon">📝</div>
+<div class="card-title">プロンプトって何？</div>
+<div class="card-desc">プロンプトの基本概念から、伝わる指示の構造まで初歩からわかる！</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- プロンプト③：プロンプトの作り方（入門） -->
+<a class="lcard cat-purple" data-keywords="プロンプト 作り方 入門 はじめて" href="Pages/プロンプトの作り方_入門_.html">
+<div class="card-tag">入門</div>
+<div class="card-icon">🌱</div>
+<div class="card-title">プロンプトの作り方（入門）</div>
+<div class="card-desc">ゼロから始めるプロンプト作成。最初の一歩はここから！</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- プロンプト④：プロンプトの作り方（実践） -->
+<a class="lcard cat-purple" data-keywords="プロンプト 作り方 実践 テクニック" href="Pages/プロンプトの作り方_実践_.html">
+<div class="card-tag">実践</div>
+<div class="card-icon">⚡</div>
+<div class="card-title">プロンプトの作り方（実践）</div>
+<div class="card-desc">実際の業務で使える！回答品質が上がる具体的なプロンプト作成テクニック。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- プロンプト⑥：魔法のプロンプト♪ -->
+<a class="lcard cat-purple" data-keywords="魔法 プロンプト 便利 テクニック" href="Pages/魔法のプロンプト_.html">
+<span class="badge-new">NEW</span>
+<div class="card-tag">応用</div>
+<div class="card-icon">🔮</div>
+<div class="card-title">魔法のプロンプト♪</div>
+<div class="card-desc">知っていると一気に使いこなせる！反則級に便利なプロンプトを大公開。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- プロンプト⑦：よく使うプロンプトはどこに保存？ -->
+<a class="lcard cat-purple" data-keywords="保存 プロンプト 管理 どこに" href="Pages/よく使うプロンプトはどこに保存_.html">
+<span class="badge-new">NEW</span>
+<div class="card-tag">管理</div>
+<div class="card-icon">💾</div>
+<div class="card-title">よく使うプロンプトはどこに保存？</div>
+<div class="card-desc">使い回せるプロンプトの保存方法・整理術・共有の仕方を紹介。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 実践⑥：おすすめWebサイト（プロンプティア） -->
+<a class="lcard cat-purple" data-keywords="おすすめ サイト プロンプティア 外部" href="Pages/おすすめWebサイト_プロンプティア_.html">
+<div class="card-tag">外部リソース</div>
+<div class="card-icon">🌐</div>
+<div class="card-title">おすすめWebサイト（プロンプティア）</div>
+<div class="card-desc">AI学習に役立つ外部サービス「プロンプティア」の使い方と活用法を紹介。</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+</div>
+</section>
+<!-- =====================================================
+       カテゴリ④ 安全・ルール・注意事項（金）
+       現在：6ページ
+  ===================================================== -->
+<section aria-label="安全・ルール">
+<div class="sec-header">
+<div class="sec-icon si-gold">🛡️</div>
+<h2>安全・ルール・注意事項</h2>
+<span class="sec-count">6ページ</span>
+</div>
+<div class="card-grid">
+<!-- 安全①：生成AIを業務利用する際の注意点 -->
+<a class="lcard cat-gold" data-keywords="業務 注意点 会社 情報漏洩" href="Pages/生成AIを業務利用する際の注意点_NKC_.html">
+<div class="card-tag">重要</div>
+<div class="card-icon">🏢</div>
+<div class="card-title">生成AIを業務利用する際の注意点</div>
+<div class="card-desc">会社でAIを使う時に絶対に知っておきたいルールと注意事項まとめ。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- AI基礎④：AIは嘘をつくの？ -->
+<a class="lcard cat-gold" data-keywords="嘘 ハルシネーション 幻覚 正確さ" href="Pages/AIは嘘をつくの_.html">
+<div class="card-tag">重要</div>
+<div class="card-icon">🤥</div>
+<div class="card-title">AIは嘘をつくの？</div>
+<div class="card-desc">ハルシネーション（幻覚）って何？なぜ嘘をつくのか仕組みからやさしく説明。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- AI基礎⑤：AIを「検索ツール」として使うリスク -->
+<a class="lcard cat-gold" data-keywords="検索 リスク Google 代替" href="Pages/AIを_検索ツール_として使うリスク.html">
+<span class="badge-new">NEW</span>
+<div class="card-tag">注意</div>
+<div class="card-icon">🔍</div>
+<div class="card-title">AIを「検索ツール」として使うリスク</div>
+<div class="card-desc">「AIで検索代わり」が危ない理由。情報の鮮度・正確性の落とし穴を知ろう。</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+<!-- 安全②：AI活用のやってはいけない10選 -->
+<a class="lcard cat-gold" data-keywords="やってはいけない NG 禁止 注意" href="Pages/AI活用のやってはいけない10選.html">
+<div class="card-tag">必読</div>
+<div class="card-icon">🚫</div>
+<div class="card-title">AI活用のやってはいけない10選</div>
+<div class="card-desc">やりがちなNG行動を10個まとめました。これを読めばミスが防げます！</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 安全⑤：AIを使う前の「心構え」再掲（安全の観点から） -->
+<a class="lcard cat-gold" data-keywords="心構え リスク セキュリティ 安全" href="Pages/AIを使う心構え.html">
+<div class="card-tag">心構え</div>
+<div class="card-icon">🧩</div>
+<div class="card-title">AIを使う心構え（安全の視点）</div>
+<div class="card-desc">安全にAIを使うための心がけ。リスクを理解して賢く活用しよう。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- AI基礎⑥：AI生成物の責任は誰が負う -->
+<a class="lcard cat-gold" data-keywords="責任 法律 倫理 誰が" href="Pages/AI生成物の責任は誰が負う.html">
+<div class="card-tag">倫理</div>
+<div class="card-icon">⚖️</div>
+<div class="card-title">AI生成物の責任は誰が負う？</div>
+<div class="card-desc">AIが出した回答でトラブルが起きたら誰の責任？業務利用時の考え方を整理。</div>
+<div class="card-arrow">読む →</div>
+</a>
+</div>
+</section>
+<!-- =====================================================
+       カテゴリ⑤ AI実践活用・業務効率化（緑）
+       現在：6ページ
+  ===================================================== -->
+<section aria-label="AI実践活用・業務効率化">
+<div class="sec-header">
+<div class="sec-icon si-green">💼</div>
+<h2>AI実践活用・業務効率化</h2>
+<span class="sec-count">6ページ</span>
+</div>
+<div class="card-grid">
+<!-- 実践②：AIでできる文章加工ガイド -->
+<a class="lcard cat-green" data-keywords="文章 加工 要約 翻訳 校正" href="Pages/AIでできる文章加工ガイド.html">
+<div class="card-tag">文章</div>
+<div class="card-icon">✒️</div>
+<div class="card-title">AIでできる文章加工ガイド</div>
+<div class="card-desc">要約・翻訳・校正・文体変換…文章加工でAIが使える場面を全部紹介！</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 実践③：AI活用（新規取引先信用調査） -->
+<a class="lcard cat-green" data-keywords="取引先 信用調査 営業 プロンプト" href="Pages/AI活用_新規取引先信用調査_.html">
+<div class="card-tag">営業</div>
+<div class="card-icon">🔎</div>
+<div class="card-title">AI活用（新規取引先信用調査）</div>
+<div class="card-desc">新規取引先のリサーチにAIを活用する具体的なプロンプトと手順を解説。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 実践④：AI活用（部門別メール対応） -->
+<a class="lcard cat-green" data-keywords="メール 対応 部門 プロンプト ガイド" href="Pages/AI活用_部門別メール対応_.html">
+<div class="card-tag">メール</div>
+<div class="card-icon">📧</div>
+<div class="card-title">AI活用（部門別メール対応）</div>
+<div class="card-desc">営業・総務・経理・人事…部門ごとのメール対応プロンプトを部門別に整理。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 実践⑤：AI活用（ExcelVBAを使う準備） -->
+<a class="lcard cat-green" data-keywords="Excel VBA マクロ 準備 活用" href="Pages/AI活用_ExcelVBAを使う準備_.html">
+<div class="card-tag">Excel</div>
+<div class="card-icon">📊</div>
+<div class="card-title">AI活用（ExcelVBAを使う準備）</div>
+<div class="card-desc">AIを使ってExcel VBAマクロを作る前に知っておきたい準備と基礎知識。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 安全④：AIによる規程チェック -->
+<a class="lcard cat-green" data-keywords="規程 ガイドライン 社内ルール チェック" href="Pages/AIによる規程チェック.html">
+<div class="card-tag">ガイドライン</div>
+<div class="card-icon">📋</div>
+<div class="card-title">AIによる規程チェック</div>
+<div class="card-desc">社内規程に照らしたAI活用のチェックポイントを確認しよう。</div>
+<div class="card-arrow">読む →</div>
+</a>
+<!-- 安全③：匿名化ベストプラクティス -->
+<a class="lcard cat-green" data-keywords="匿名化 個人情報 プライバシー" href="Pages/匿名化ベストプラクティス.html">
+<div class="card-tag">プライバシー</div>
+<div class="card-icon">🎭</div>
+<div class="card-title">匿名化ベストプラクティス</div>
+<div class="card-desc">AIに渡す情報を安全にするための匿名化テクニックを実例で紹介。</div>
+<div class="card-arrow">読む →</div>
+</a>
+
+</div>
+</section>
+<!-- =====================================================
+       カテゴリ⑥ 画像・キャラクター・その他リソース（橙）
+       現在：2ページ
+  ===================================================== -->
+<section aria-label="画像・リソース">
+<div class="sec-header">
+<div class="sec-icon si-orange">🎨</div>
+<h2>画像・キャラクター・その他リソース</h2>
+<span class="sec-count">2ページ</span>
+</div>
+<div class="card-grid">
+<!-- リソース①：AIギャラリー（画像・きかく君） -->
+<a class="lcard cat-orange" data-keywords="きかく君 画像 キャラクター ギャラリー" href="Pages/AIギャラリー_画像_きかく君_.html">
+<div class="card-tag">画像</div>
+<div class="card-icon">🖼️</div>
+<div class="card-title">AIギャラリー①<br>（画像・きかく君）</div>
+<div class="card-desc">社内マスコット「きかく君」のAI生成画像をまとめたギャラリーページ。</div>
+<div class="card-arrow">見る →</div>
+</a>
+
+</div>
+</section>
+<!-- 検索ゼロ件メッセージ（キーワード検索で0件の時に表示） -->
+<div class="no-result" id="noResult" role="status">
+    🔍 「<span id="noResultWord"></span>」に一致するページが見つかりませんでした。別のキーワードをお試しください。
+  </div>
+<!-- =====================================================
+       フッター
+  ===================================================== -->
+<footer class="footer">
+<span class="copyright-pill"><strong>Powered by Oz</strong></span>
+</footer>
+</div><!-- /.shell -->
+<!-- =====================================================
+     JavaScript：キーワード検索（リアルタイム絞り込み）
+===================================================== -->
+<script>
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const cards = document.querySelectorAll('.lcard');
+  const noResult = document.getElementById('noResult');
+  let count = 0;
+
+  // 通常カードの絞り込み
+  cards.forEach(card => {
+    const title = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+    const desc  = card.querySelector('.card-desc')?.textContent.toLowerCase() || '';
+    const kw    = (card.dataset.keywords || '').toLowerCase();
+    const href  = (card.getAttribute('href') || '').toLowerCase();
+    const match = !q || title.includes(q) || desc.includes(q) || kw.includes(q) || href.includes(q);
+    card.classList.toggle('hidden', !match);
+    if (match) count++;
+  });
+
+  // ピックアップカードの絞り込み
+  document.querySelectorAll('.pickup-card').forEach(card => {
+    const t = card.querySelector('.p-title')?.textContent.toLowerCase() || '';
+    card.style.display = (!q || t.includes(q)) ? '' : 'none';
+  });
+
+  // ゼロ件メッセージ表示制御
+  if (q && count === 0) {
+    noResult.classList.add('show');
+    document.getElementById('noResultWord').textContent = q;
+  } else {
+    noResult.classList.remove('show');
+  }
+}
+
+// Enterキーでも検索実行
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+</script>
+</body>
+</html>

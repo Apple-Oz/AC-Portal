@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🤖QCC｜AIでできる文章加工ガイド</title>
+
+  <style>
+    :root{
+      --bg:#eef1f7; --card:#ffffff; --ink:#1a2233; --muted:#5a6a88; --brand:#1a7fd4; --accent:#40a8f0; --bd:#a0c8f0;
+      --gradient:linear-gradient(135deg,#e0f2fe,#38bdf8,#0284c7,#1e3a8a);
+    }
+    html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',Meiryo,sans-serif;line-height:1.75}
+    .shell{max-width:1080px;margin:24px auto;padding:0 16px}
+    .appbar{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 14px;box-shadow:0 8px 30px rgba(37,99,235,.10);position:sticky;top:10px;z-index:10}
+    .appbar .row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img.logo{height:32px;}
+    .brand .ttl{font-size:1.2rem;font-weight:750;letter-spacing:.02em;background:var(--gradient);color:#fff;padding:4px 12px;border-radius:10px;}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}
+    @media (max-width: 900px){.layout{grid-template-columns:1fr} .nav{margin-bottom:16px;position:relative;top:0}}
+    .nav{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .nav h3{font-size:.95rem;margin:.25rem 0 .5rem;color:#1a7fd4;font-weight:700}
+    .nav a{display:block;padding:10px 12px;margin:6px 0;color:var(--ink);text-decoration:none;border-radius:10px;font-weight:500}
+    .nav a:hover{background:#eff8ff;border:1px dashed #a0c8f0;color:#1a7fd4}
+    .page{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;box-shadow:0 16px 40px rgba(26,127,212,.12)}
+    .wrap{max-width:760px}
+    h1{font-size:1.75rem;margin:.2rem 0 .6rem;color:#1a7fd4;font-weight:800}
+    h2{font-size:1.2rem;margin:1.5rem 0 .5rem;color:#1a7fd4;font-weight:700}
+    h3.sub{font-size:1rem;margin:1.2rem 0 .3rem;color:#1a7fd4;font-weight:700}
+    .list{padding-left:1.6rem}
+    .emoji-list{list-style:none;padding-left:0;}
+    .emoji-list li{position:relative;padding-left:1.8em;margin:.5rem 0}
+    .emoji-list li::before{content:attr(data-emoji);position:absolute;left:0;font-size:.95em;line-height:1.8;}
+    .footer{color:var(--muted);font-size:.92rem;margin-top:40px;padding-top:24px;border-top:2px solid var(--bd);text-align:center}
+    .copyright-pill{display:block;margin-top:8px;background:#eff8ff;border:2px solid #40a8f0;color:#1a7fd4;font-weight:800;border-radius:999px;padding:6px 16px;font-size:.9rem;text-align:center;}
+    .back-home{display:inline-flex;align-items:center;gap:.5em;background:#eff8ff;color:#1a7fd4;border:1.5px solid #40a8f0;padding:8px 12px;border-radius:10px;font-weight:700;text-decoration:none}
+    .back-home:hover{background:#dbeeff}
+    .info-box{background:#f0f8ff;border-left:4px solid #40a8f0;border-radius:6px;padding:10px 14px;margin-top:8px;font-size:.95rem;color:#1a2233;}
+
+    /* ===== テーブル ===== */
+    .ai-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.88rem;}
+    .ai-table th{background:var(--gradient);color:#fff;padding:10px 12px;text-align:center;font-weight:700;font-size:.85rem;}
+    .ai-table th:first-child{text-align:left;border-radius:8px 0 0 0;}
+    .ai-table th:last-child{border-radius:0 8px 0 0;}
+    .ai-table td{padding:9px 12px;border-bottom:1px solid #dce8f5;vertical-align:top;}
+    .ai-table tr:last-child td{border-bottom:none;}
+    .ai-table tr:nth-child(even) td{background:#f5f9ff;}
+    .ai-table tr:hover td{background:#e8f4ff;}
+    .ai-table td:first-child{font-weight:700;color:#1a2233;}
+
+    /* ===== 事例カード ===== */
+    .use-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+    @media(max-width:600px){.use-grid{grid-template-columns:1fr}}
+    .use-card{border:1px solid #a0c8f0;border-radius:10px;padding:14px 16px;background:#f5f9ff;}
+    .use-card .scene{font-weight:700;font-size:.95rem;color:#1a2233;margin-bottom:6px;}
+    .use-card .prompt-label{font-size:.78rem;color:#1a7fd4;font-weight:700;margin-top:8px;margin-bottom:2px;}
+    .use-card .prompt{background:#fff;border:1px dashed #a0c8f0;border-radius:6px;padding:6px 10px;font-size:.82rem;color:#3a4a66;font-style:italic;margin-bottom:6px;}
+    .use-card .result-label{font-size:.78rem;color:#10a37f;font-weight:700;margin-bottom:2px;}
+    .use-card .result{background:#f0fff8;border:1px solid #a0dfc0;border-radius:6px;padding:6px 10px;font-size:.82rem;color:#1a3a2a;}
+    .use-card .reason{font-size:.82rem;color:#5a6a88;margin-top:6px;}
+
+    /* ===== ステップ ===== */
+    .step-box{background:#f0f8ff;border:1px solid #a0c8f0;border-radius:10px;padding:14px 18px;margin:.8rem 0;}
+    .step-box .step-num{font-size:.78rem;font-weight:800;color:#fff;background:#1a7fd4;border-radius:999px;padding:2px 10px;display:inline-block;margin-bottom:4px;}
+    .step-box .step-title{font-weight:700;font-size:.97rem;color:#1a2233;margin-bottom:4px;}
+    .step-box .step-desc{font-size:.88rem;color:#3a4a66;}
+
+    /* ===== 難易度バッジ ===== */
+    .badge-easy{background:#22c55e;color:#fff;font-size:.72rem;font-weight:700;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:middle;}
+    .badge-mid{background:#f59e0b;color:#fff;font-size:.72rem;font-weight:700;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:middle;}
+    .badge-adv{background:#ef4444;color:#fff;font-size:.72rem;font-weight:700;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:middle;}
+
+    /* 注意ボックス */
+    .warn-box{background:#fff8e1;border-left:4px solid #f59e0b;border-radius:6px;padding:10px 14px;margin-top:8px;font-size:.92rem;color:#5a3a00;}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ===== ヘッダー ===== -->
+  <div class="appbar" role="banner">
+    <div class="row">
+      <div class="brand">
+        <div class="ttl">🤖 AI‑Driven Quality. Powered by Oz. 🧩</div>
+      </div>
+      <div class="brand" style="gap:10px;">
+        <div style="font-size:.9rem;color:#4a4a4a;font-weight:600;">🌱 AIでできる事を広げよう！ ✨</div>
+        <a href="https://claude.ai" target="_blank">
+  	<img src="../assets/Claude-Logo.png" class="logo" alt="Claude ロゴ" />
+	</a>
+
+        <a class="back-home" href="../index.html" aria-label="トップページに戻る">➡ 🏠</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ===== サイドナビ ===== -->
+    <nav class="nav" aria-label="ページ内メニュー">
+      <h3>目次</h3>
+      <a href="#what">文章加工ってなに？</a>
+      <a href="#overview">加工の種類いちらん</a>
+      <a href="#examples">具体的な事例10選</a>
+      <a href="#howto">使い方のコツ</a>
+      <a href="#tips">やってはいけないこと</a>
+      <a class="back-home" href="index.html" style="margin-top:10px;">🏠 トップページに戻る</a>
+    </nav>
+
+    <!-- ===== メインコンテンツ ===== -->
+    <main class="page">
+      <div class="wrap">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:.4rem;">
+          <h1 style="margin:0;">AIでできる文章加工ガイド ✍️</h1>
+        </div>
+
+        <div class="info-box">
+          AIは文章を書くだけではありません。すでにある文章を<strong>「もっとよくする」加工</strong>がとても得意です！<br>
+          このページでは、AI初心者の方に向けて、どんな文章加工ができるのかを<strong>具体的な例文つき</strong>でわかりやすく紹介します。
+        </div>
+
+        <!-- ===== 文章加工ってなに？ ===== -->
+        <section id="what">
+          <h2>1. 「文章加工」ってなに？ 🤔</h2>
+          <p>文章加工とは、<strong>すでにある文章をAIに渡して、目的に合わせて変えてもらうこと</strong>です。ゼロから文章を作るだけでなく、こんなことができます。</p>
+
+          <div class="use-grid">
+            <div class="use-card">
+              <div class="scene">✂️ 短くする（要約）</div>
+              <div class="reason">長い文章を短くまとめてもらう。<br>報告書・メール・記事などに使える</div>
+            </div>
+            <div class="use-card">
+              <div class="scene">🔄 言い方を変える（言い換え）</div>
+              <div class="reason">難しい言葉を簡単に、<br>または専門的に変えてもらう</div>
+            </div>
+            <div class="use-card">
+              <div class="scene">🎯 トーンを変える（文体調整）</div>
+              <div class="reason">カジュアルな文章をビジネス向けに、<br>または親しみやすく変える</div>
+            </div>
+            <div class="use-card">
+              <div class="scene">🔍 チェック・修正（校正）</div>
+              <div class="reason">誤字・脱字・わかりにくい表現を見つけて<br>直してもらう</div>
+            </div>
+            <div class="use-card">
+              <div class="scene">🌍 他の言語に変える（翻訳）</div>
+              <div class="reason">日本語→英語など、<br>別の言語に自然に翻訳してもらう</div>
+            </div>
+            <div class="use-card">
+              <div class="scene">📋 構造を整える（整形）</div>
+              <div class="reason">箇条書き・表・見出しつきの<br>読みやすい形に整えてもらう</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 加工の種類一覧 ===== -->
+        <section id="overview">
+          <h2>2. 文章加工の種類いちらん 📋</h2>
+          <div style="overflow-x:auto;">
+            <table class="ai-table">
+              <thead>
+                <tr>
+                  <th>加工の種類</th>
+                  <th>こんなときに使う</th>
+                  <th>難易度</th>
+                  <th>よく使うシーン</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>要約<br>（ようやく）</td>
+                  <td>長い文章を短くしたい</td>
+                  <td><span class="badge-easy">かんたん</span></td>
+                  <td>会議メモ・ニュース記事・<br>報告書</td>
+                </tr>
+                <tr>
+                  <td>言い換え・<br>リライト</td>
+                  <td>同じ内容を別の表現にしたい</td>
+                  <td><span class="badge-easy">かんたん</span></td>
+                  <td>メール・SNS投稿・提案書</td>
+                </tr>
+                <tr>
+                  <td>文体変換</td>
+                  <td>堅さ・柔らかさを変えたい</td>
+                  <td><span class="badge-easy">かんたん</span></td>
+                  <td>社外メール・お客様対応文</td>
+                </tr>
+                <tr>
+                  <td>校正<br>（こうせい）</td>
+                  <td>誤りや不自然な箇所を直したい</td>
+                  <td><span class="badge-easy">かんたん</span></td>
+                  <td>重要書類・プレゼン資料</td>
+                </tr>
+                <tr>
+                  <td>翻訳<br>（ほんやく）</td>
+                  <td>別の言語にしたい</td>
+                  <td><span class="badge-easy">かんたん</span></td>
+                  <td>英文メール・海外資料の読解</td>
+                </tr>
+                <tr>
+                  <td>箇条書き化</td>
+                  <td>読みやすく整理したい</td>
+                  <td><span class="badge-easy">かんたん</span></td>
+                  <td>議事録・手順書・マニュアル</td>
+                </tr>
+                <tr>
+                  <td>拡張<br>（かくちょう）</td>
+                  <td>内容をふくらませたい</td>
+                  <td><span class="badge-mid">ふつう</span></td>
+                  <td>ブログ記事・提案書・スピーチ原稿</td>
+                </tr>
+                <tr>
+                  <td>感情調整</td>
+                  <td>怒り・感情的な文を落ち着かせたい</td>
+                  <td><span class="badge-mid">ふつう</span></td>
+                  <td>クレーム対応・苦情の返信文</td>
+                </tr>
+                <tr>
+                  <td>ターゲット<br>合わせ</td>
+                  <td>読む人に合った表現にしたい</td>
+                  <td><span class="badge-mid">ふつう</span></td>
+                  <td>子ども向け説明・専門家向け資料</td>
+                </tr>
+                <tr>
+                  <td>複数文章の統合</td>
+                  <td>バラバラな情報を1つにまとめたい</td>
+                  <td><span class="badge-adv">むずかしめ</span></td>
+                  <td>レポート・提案書・議事録まとめ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size:.8rem;color:#8a9ab5;margin-top:6px;">※ 難易度は「AIへの指示の簡単さ」の目安です。どれも試す価値があります！</p>
+        </section>
+
+        <!-- ===== 具体的な事例 ===== -->
+        <section id="examples">
+          <h2>3. 具体的な事例10選 💡</h2>
+          <p>実際にAIにどんな指示（プロンプト）を入れると、どんな結果が得られるかをご紹介します。</p>
+
+          <!-- 事例1 -->
+          <h3 class="sub">① 長いメールを短く要約する <span class="badge-easy">かんたん</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示（こんなふうに入力）</div>
+            <div class="prompt">「次のメールを3行以内に要約してください。」＋ メール本文をそのまま貼り付ける</div>
+            <div class="result-label">✅ AIが出してくれる結果</div>
+            <div class="result">・〇〇プロジェクトの進捗報告<br>・来週月曜の会議は14時から変更なし<br>・資料提出は木曜日15時が締切</div>
+            <div class="reason">📌 <strong>長くて読む気がしないメールも</strong>、要点だけ一瞬で把握できます！</div>
+          </div>
+
+          <!-- 事例2 -->
+          <h3 class="sub">② ビジネスメールをわかりやすく書き直す <span class="badge-easy">かんたん</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「次の文章を、取引先への丁寧なビジネスメールに書き直してください。」＋ 自分の書いたラフな文章を貼り付ける</div>
+            <div class="result-label">✅ 変換例（Before → After）</div>
+            <div class="result">
+              <strong>Before：</strong>明日の会議の場所変わりました。ご確認ください。<br><br>
+              <strong>After：</strong>平素より大変お世話になっております。誠に恐れ入りますが、明日の会議につきまして、開催場所に変更が生じました。ご確認のほど、何卒よろしくお願い申し上げます。
+            </div>
+            <div class="reason">📌 ラフなメモを丁寧なビジネス文書に一瞬で変換！メール作成の時間が大幅に短縮できます。</div>
+          </div>
+
+          <!-- 事例3 -->
+          <h3 class="sub">③ 難しい専門用語を誰でもわかる言葉に変える <span class="badge-easy">かんたん</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「次の文章を、IT知識がない60代の方にもわかるように書き直してください。」</div>
+            <div class="result-label">✅ 変換例</div>
+            <div class="result">
+              <strong>Before：</strong>クラウド上でAPIを活用したデータ連携を実装する予定です。<br><br>
+              <strong>After：</strong>インターネット上の共有スペースを使って、別々のシステム同士でデータをやりとりできる仕組みを作る予定です。
+            </div>
+            <div class="reason">📌 社内説明資料・お客様向け案内文など、読む人によって言葉を調整できます。</div>
+          </div>
+
+          <!-- 事例4 -->
+          <h3 class="sub">④ 感情的な文章を落ち着いた表現に変える <span class="badge-mid">ふつう</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「次のクレームメールに対する返信を、冷静・丁寧・前向きなトーンで作成してください。」</div>
+            <div class="result-label">✅ 活用シーン</div>
+            <div class="result">クレーム対応・苦情返信・感情的になってしまったメールの修正など。<br>感情が入りがちな場面でも、AIが中立的な言葉遣いに整えてくれます。</div>
+            <div class="reason">📌 カッとなって送りそうになったメールも、AIに渡してワンクッション置けます！</div>
+          </div>
+
+          <!-- 事例5 -->
+          <h3 class="sub">⑤ 議事録をきれいに整理する <span class="badge-easy">かんたん</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「次のメモを、議事録の形式（日時・参加者・決定事項・次のアクション）に整理してください。」＋ 走り書きメモを貼り付ける</div>
+            <div class="result-label">✅ 変換例</div>
+            <div class="result">
+              【日時】2026年2月27日 14:00〜15:00<br>
+              【参加者】〇〇、△△、□□<br>
+              【決定事項】新サービスの名称を「スマートQC」に決定<br>
+              【次のアクション】・△△：資料修正（3/3まで）　・□□：顧客確認（3/5まで）
+            </div>
+            <div class="reason">📌 走り書きメモでもOK！きれいな議事録が数秒で完成します。</div>
+          </div>
+
+          <!-- 事例6 -->
+          <h3 class="sub">⑥ 英語を日本語に自然に翻訳する <span class="badge-easy">かんたん</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「次の英文を、自然な日本語のビジネスメールに翻訳してください。」＋ 英文を貼り付ける</div>
+            <div class="result-label">✅ ポイント</div>
+            <div class="result">単純な直訳ではなく、ビジネスシーンに合った自然な日本語に変換してくれます。「Dear〜」→「〇〇様、いつもお世話になっております」のような文化的な表現調整も得意です。</div>
+            <div class="reason">📌 海外からのメールや英語の契約書も、AIが瞬時に読み解いてくれます！</div>
+          </div>
+
+          <!-- 事例7 -->
+          <h3 class="sub">⑦ SNS投稿文を魅力的に書き直す <span class="badge-easy">かんたん</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「次の内容を、X（Twitter）で拡散されやすい魅力的な投稿文にしてください。140字以内で。」</div>
+            <div class="result-label">✅ 変換例</div>
+            <div class="result">
+              <strong>Before：</strong>新しいAIツールの使い方を説明するページを作りました。<br><br>
+              <strong>After：</strong>「AIって難しそう…」そんな方へ✨<br>初心者でも今日から使えるAI活用ガイドを公開しました！メール・議事録・翻訳まで、あなたの仕事が変わります🚀 ぜひご覧ください！
+            </div>
+            <div class="reason">📌 文字数制限がある中でも、印象に残る表現に仕上げてくれます。</div>
+          </div>
+
+          <!-- 事例8 -->
+          <h3 class="sub">⑧ 箇条書きを文章に、文章を箇条書きに変換する <span class="badge-easy">かんたん</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「次の箇条書きを、読み手に伝わる自然な文章にしてください。」または<br>「次の文章を、わかりやすい箇条書きにしてください。」</div>
+            <div class="result-label">✅ こんな場面で役立つ</div>
+            <div class="result">・レポートの下書き（箇条書き→文章）<br>・スライド資料の要点整理（文章→箇条書き）<br>・マニュアル作成（手順を整理）</div>
+            <div class="reason">📌 書き方のスタイルをかんたんに切り替えられます。</div>
+          </div>
+
+          <!-- 事例9 -->
+          <h3 class="sub">⑨ ワンフレーズから文章をふくらませる <span class="badge-mid">ふつう</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「次のキーワードをもとに、300字程度の紹介文を書いてください。」<br>＋ 商品名・特徴・ターゲットなどを箇条書きで入力</div>
+            <div class="result-label">✅ 活用シーン</div>
+            <div class="result">商品説明文・会社紹介・サービス案内・自己紹介文など。アイデアのメモ書きをもとに、完成度の高い文章を一気に生成できます。</div>
+            <div class="reason">📌 「何を書いていいかわからない…」という状態でもAIが助けてくれます！</div>
+          </div>
+
+          <!-- 事例10 -->
+          <h3 class="sub">⑩ 複数の文章を一つにまとめる <span class="badge-adv">むずかしめ</span></h3>
+          <div class="use-card" style="margin-bottom:10px;">
+            <div class="prompt-label">💬 AIへの指示</div>
+            <div class="prompt">「以下の3つのアンケート結果をもとに、全体の傾向をまとめた報告文を800字程度で作成してください。」＋ 複数のアンケート結果を貼り付ける</div>
+            <div class="result-label">✅ 活用シーン</div>
+            <div class="result">複数のヒアリング結果・アンケート・会議メモなどを統合して、一貫性のある報告書・提案書に仕上げることができます。</div>
+            <div class="reason">📌 情報が多くなるほど、AIの真価が発揮されます！</div>
+          </div>
+        </section>
+
+        <!-- ===== 使い方のコツ ===== -->
+        <section id="howto">
+          <h2>4. AIへの上手な指示の出し方 🎯</h2>
+          <p>AIへの指示（プロンプト）の出し方を少し工夫するだけで結果が大きく変わります。</p>
+
+          <div class="step-box">
+            <div class="step-num">コツ 1</div>
+            <div class="step-title">「誰向けか」を伝える</div>
+            <div class="step-desc">「小学生にもわかるように」「上司への報告文として」「海外のお客様向けに」など、<br>読む相手を伝えると、適切なトーンや言葉遣いで仕上げてくれます。</div>
+          </div>
+
+          <div class="step-box">
+            <div class="step-num">コツ 2</div>
+            <div class="step-title">「文字数・分量」を指定する</div>
+            <div class="step-desc">「100字以内で」「3行にまとめて」「A4用紙1枚分くらいで」のように、<br>出来上がりの量を指定すると、使い勝手の良い文章になります。</div>
+          </div>
+
+          <div class="step-box">
+            <div class="step-num">コツ 3</div>
+            <div class="step-title">「形式・フォーマット」を伝える</div>
+            <div class="step-desc">「箇条書きで」「表にして」「見出しをつけて」「メール形式で」など、<br>どんな見た目にしたいかを伝えると、そのまま使える形で仕上がります。</div>
+          </div>
+
+          <div class="step-box">
+            <div class="step-num">コツ 4</div>
+            <div class="step-title">「加工前の文章」をそのまま貼る</div>
+            <div class="step-desc">指示の後に、変えたい文章・メール・メモをそのまま貼り付けるだけでOKです。<br>コピー＆ペーストで手軽に使えます。</div>
+          </div>
+
+          <div class="step-box">
+            <div class="step-num">コツ 5</div>
+            <div class="step-title">気に入らなければ「やり直して」と言う</div>
+            <div class="step-desc">「もう少し柔らかい表現にして」「もっと短くして」「敬語を増やして」など、<br>追加の指示を出せば何度でも調整してもらえます。</div>
+          </div>
+        </section>
+
+        <!-- ===== やってはいけないこと ===== -->
+        <section id="tips">
+          <h2>5. やってはいけないこと ⚠️</h2>
+
+          <div class="warn-box">
+            ⚠️ <strong>AIへの文章加工を使う際の注意点をしっかり確認しましょう。</strong>
+          </div>
+
+          <ul class="emoji-list" style="margin-top:12px;">
+            <li data-emoji="🚫"><strong>個人情報・機密情報を入力しない</strong>：<br>社員の個人情報、取引先の非公開情報、<br>社外秘の資料などは絶対に入力しないこと（特に無料版は要注意）</li>
+            <li data-emoji="🚫"><strong>AIの出力をそのまま使わない</strong>：<br>AIは間違いを含むことがあります。<br>必ず内容を確認してから使いましょう</li>
+            <li data-emoji="🚫"><strong>著作権のある文章をそのまま入力しない</strong>：<br>本・記事・他社の資料などを無断で貼り付けることは控えましょう</li>
+            <li data-emoji="⚠️"><strong>重要な契約書・法的文書はそのまま使わない</strong>：<br>法的な文章はAI出力を参考にしつつ、必ず専門家に確認してもらいましょう</li>
+            <li data-emoji="✅"><strong>「AIが作った文章です」と伝える場面に注意</strong>：<br>状況によっては、AI生成文である事を相手に伝えることが誠実な対応になります</li>
+          </ul>
+        </section>
+
+        <!-- フッター -->
+        <div class="footer">
+          <div style="margin:8px 0 6px;font-size:.88rem;color:#8a9ab5;">このページは、AI活用を広げるために作成された学習用ガイドです</div>
+          <span class="copyright-pill"><strong>Powered by Oz</strong></span>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+</div>
+</body>
+</html>

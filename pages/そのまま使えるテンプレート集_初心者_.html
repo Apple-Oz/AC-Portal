@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🤖QCC｜そのまま使えるプロンプトテンプレート集（初心者向け）</title>
+
+  <style>
+    :root{
+      --bg:#eef1f7; --card:#ffffff; --ink:#1a2233; --muted:#5a6a88; --brand:#1a7fd4; --accent:#40a8f0; --bd:#a0c8f0;
+      --gradient:linear-gradient(135deg,#e0f2fe,#38bdf8,#0284c7,#1e3a8a);
+    }
+    html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Kaku Gothic ProN','Noto Sans JP',Meiryo,sans-serif;line-height:1.75}
+    .shell{max-width:1080px;margin:24px auto;padding:0 16px}
+    .appbar{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 14px;box-shadow:0 8px 30px rgba(37,99,235,.10);position:sticky;top:10px;z-index:10}
+    .appbar .row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand .ttl{font-size:1.2rem;font-weight:750;letter-spacing:.02em;background:var(--gradient);color:#fff;padding:4px 12px;border-radius:10px;}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}
+    @media (max-width: 900px){.layout{grid-template-columns:1fr} .nav{margin-bottom:16px;position:relative;top:0} }
+    .nav{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .nav h3{font-size:.95rem;margin:.25rem 0 .5rem;color:#1a7fd4;font-weight:700}
+    .nav a{display:block;padding:10px 12px;margin:6px 0;color:var(--ink);text-decoration:none;border-radius:10px;font-weight:500}
+    .nav a:hover{background:#eff8ff;border:1px dashed #a0c8f0;color:#1a7fd4}
+    .page{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px;box-shadow:0 16px 40px rgba(26,127,212,.12)}
+    .wrap{max-width:720px}
+    h1{font-size:1.75rem;margin:.2rem 0 .6rem;color:#1a7fd4;font-weight:800}
+    h2{font-size:1.2rem;margin:1.6rem 0 .45rem;color:#1a7fd4;font-weight:700}
+    .list{padding-left:1.6rem}
+    .emoji-list{padding:0;list-style:none}
+    .emoji-list li{position:relative;padding-left:1.6em;margin:.4rem 0}
+    .emoji-list li::before{content:attr(data-emoji);position:absolute;left:0;color:#1a7fd4;font-size:.9em;line-height:2;}
+    .footer{color:var(--muted);font-size:.92rem;margin-top:20px;text-align:center}
+    .copyright-pill{display:block;margin-top:8px;background:#eff8ff;border:2px solid #40a8f0;color:#1a7fd4;font-weight:800;border-radius:999px;padding:6px 16px;font-size:.9rem;text-align:center;}
+    .back-home{display:inline-flex;align-items:center;gap:.5em;background:#eff8ff;color:#1a7fd4;border:1.5px solid #40a8f0;padding:8px 12px;border-radius:10px;font-weight:700;text-decoration:none}
+    .back-home:hover{background:#dbeeff}
+
+    /* ── 注意ボックス ── */
+    .caution-box{background:#fffbeb;border:2px solid #fbbf24;border-radius:12px;padding:14px 18px;margin:10px 0}
+    .caution-box .caution-title{color:#b45309;font-weight:800;font-size:1rem;margin-bottom:6px}
+
+    /* ── ヒントボックス ── */
+    .hint-box{background:linear-gradient(135deg,#eff8ff,#dbeeff);border:2px solid #40a8f0;border-radius:12px;padding:14px 18px;margin:12px 0 16px;}
+    .hint-box .hint-title{color:#1a7fd4;font-weight:800;font-size:.97rem;margin-bottom:6px}
+
+    /* ── テンプレートカード ── */
+    .template-card{background:#f7fbff;border:1.5px solid #b6d9f5;border-radius:14px;padding:16px 18px;margin-bottom:14px;position:relative;}
+    .template-card .card-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+    .template-card .card-icon{font-size:1.4rem;}
+    .template-card .card-title{font-weight:800;color:#0284c7;font-size:1rem;}
+    .template-card .card-scene{font-size:.83rem;color:#5a6a88;background:#eff8ff;border:1px dashed #40a8f0;border-radius:8px;padding:2px 8px;margin-left:auto;white-space:nowrap;}
+    .template-card .card-prompt{background:#fff;border:1.5px dashed #40a8f0;border-radius:10px;padding:12px 14px;font-size:.92rem;color:#1a2233;white-space:pre-wrap;line-height:1.8;position:relative;}
+    .template-card .card-prompt .placeholder{color:#f59e0b;font-weight:700;}
+    .copy-btn{position:absolute;top:10px;right:10px;background:var(--gradient);color:#fff;border:none;border-radius:8px;padding:4px 12px;font-size:.8rem;font-weight:700;cursor:pointer;transition:.2s;}
+    .copy-btn:hover{opacity:.85;}
+    .copy-btn:active{opacity:.7;}
+    .card-tip{font-size:.82rem;color:#5a6a88;margin-top:8px;}
+    .card-tip span{color:#1a7fd4;font-weight:700;}
+
+    /* ── セクション区切り ── */
+    .section-label{display:inline-flex;align-items:center;gap:8px;background:var(--gradient);color:#fff;font-weight:800;font-size:.95rem;border-radius:999px;padding:5px 16px;margin:18px 0 10px;}
+
+    /* ── バッジ ── */
+    .badge-good{background:#d1fae5;color:#065f46;border-radius:6px;padding:2px 7px;font-size:.82rem;font-weight:700;white-space:nowrap}
+    .badge-mid{background:#fef9c3;color:#92400e;border-radius:6px;padding:2px 7px;font-size:.82rem;font-weight:700;white-space:nowrap}
+
+    /* ── ステップリスト ── */
+    .step-list{list-style:none;padding:0;margin:12px 0 0;counter-reset:steps}
+    .step-list li{counter-increment:steps;display:flex;align-items:flex-start;gap:12px;padding:12px 14px;margin-bottom:10px;background:#f7fbff;border:1px solid #b6d9f5;border-radius:12px;}
+    .step-list li::before{content:counter(steps);min-width:28px;height:28px;border-radius:50%;background:var(--gradient);color:#fff;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .step-list li .step-body{flex:1}
+    .step-list li .step-title{font-weight:700;color:#0284c7;margin-bottom:3px}
+    .step-list li .step-desc{font-size:.93rem;color:#344;line-height:1.65}
+    .step-list li .step-hint{display:inline-block;margin-top:5px;background:#eff8ff;border:1px dashed #40a8f0;color:#1a7fd4;font-size:.82rem;border-radius:8px;padding:3px 9px}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="appbar" role="banner">
+    <div class="row">
+      <div class="brand">
+        <div class="ttl">🤖 AI‑Driven Quality. Powered by Oz. 🧩</div>
+      </div>
+      <div class="brand" style="gap:10px;">
+        <div style="font-size:.9rem;color:#4a4a4a;font-weight:600;">🌱 AIでできる事を広げよう！ ✨</div>
+        <a class="back-home" href="../index.html" aria-label="トップページに戻る">➡ 🏠</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <nav class="nav" aria-label="ページ内メニュー">
+      <h3>📋 目次</h3>
+      <a href="#howto">テンプレートの使い方</a>
+      <a href="#sales">💼 営業</a>
+      <a href="#it">💻 情シス</a>
+      <a href="#accounting">🧾 経理</a>
+      <a href="#hr-general">👥 人事・給与・採用</a>
+      <a href="#training">📚 研修</a>
+      <a href="#purchase">📦 購買</a>
+      <a href="#general-affairs">🏢 総務</a>
+      <a href="#legal">⚖️ 法務</a>
+      <a href="#caution">⚠️ 使う前に確認</a>
+      <a class="back-home" href="index.html" style="margin-top:10px;">🏠 トップページに戻る</a>
+    </nav>
+
+    <main class="page">
+      <div class="wrap">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:.4rem;">
+          <div>
+            <h1 style="margin:0;">そのまま使えるテンプレート集 ✨</h1>
+            <p style="font-size:.95rem;color:#5a6a88;margin:.4rem 0 0;">初心者向け｜業務別プロンプト 厳選集</p>
+          </div>
+        </div>
+
+        <!-- ── 使い方 ── -->
+        <section id="howto">
+          <h2>🐣 テンプレートの使い方</h2>
+          <div class="hint-box">
+            <div class="hint-title">💡 3ステップで使えます！</div>
+            <ol class="step-list" style="margin:0;">
+              <li>
+                <div class="step-body">
+                  <div class="step-title">テンプレートをコピーする</div>
+                  <div class="step-desc">使いたいテンプレートの「📋コピー」ボタンを押すと、クリップボードにコピーされます。</div>
+                </div>
+              </li>
+              <li>
+                <div class="step-body">
+                  <div class="step-title">【　】の部分を自分の情報に書き換える</div>
+                  <div class="step-desc">オレンジ色の【　】は入力が必要な部分です。実際の情報に置き換えてください。</div>
+                  <div class="step-hint">例：【取引先名】→「株式会社〇〇」</div>
+                </div>
+              </li>
+              <li>
+                <div class="step-body">
+                  <div class="step-title">Claudeのチャット欄に貼り付けて送信！</div>
+                  <div class="step-desc">claude.ai を開いて、チャット欄に貼り付けてEnterを押せば完了🎉</div>
+                  <div class="step-hint">🔗 <a href="https://claude.ai" target="_blank" style="color:#1a7fd4;font-weight:700;">https://claude.ai</a> を開こう</div>
+                </div>
+              </li>
+            </ol>
+          </div>
+          <div class="caution-box">
+            <div class="caution-title">⚠️ 必ずご確認ください</div>
+            <ul class="emoji-list">
+              <li data-emoji="●">個人情報（氏名・住所・電話番号）は入力しないでください</li>
+              <li data-emoji="●">社外秘・機密情報は入力しないでください</li>
+              <li data-emoji="●">AIの回答は必ず人間が確認・判断してから使用してください</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ── 営業 ── -->
+        <section id="sales">
+          <div class="section-label">💼 営業</div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">✉️</span>
+              <span class="card-title">提案メールの下書き</span>
+              <span class="card-scene">社外メール</span>
+            </div>
+            <div class="card-prompt" id="tpl-sales-1">以下の情報をもとに、新規提案メールの文章を作成してください。
+
+■ 宛先：<span class="placeholder">【取引先名・担当者名】</span>
+■ 提案内容：<span class="placeholder">【提案する製品・サービスの概要】</span>
+■ 提案の背景・目的：<span class="placeholder">【なぜ提案するか・相手にとっての課題や背景】</span>
+■ アピールポイント：<span class="placeholder">【強みや差別化ポイント】</span>
+■ 希望する次のアクション：<span class="placeholder">【例：商談のご検討、資料送付など】</span>
+
+条件：
+- 丁寧でビジネスらしい文体で
+- 押しつけがましくない、自然な流れで
+- 250〜350文字程度でまとめてください</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-sales-1', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「提案の背景」を具体的に書くほど、刺さる文章になります！</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📞</span>
+              <span class="card-title">商談後のお礼メール</span>
+              <span class="card-scene">社外メール</span>
+            </div>
+            <div class="card-prompt" id="tpl-sales-2">商談後のお礼メールを作成してください。
+
+■ 宛先：<span class="placeholder">【取引先名・担当者名】</span>
+■ 商談日：<span class="placeholder">【日付】</span>
+■ 商談で話した内容（要点）：<span class="placeholder">【例：新製品Aのデモ、価格の確認、導入スケジュールの検討】</span>
+■ 次のステップ：<span class="placeholder">【例：来週中に見積書を送付、〇〇の資料を準備】</span>
+
+条件：
+- 感謝の気持ちが伝わる丁寧な文体で
+- 次の行動が分かりやすく含まれるよう
+- 読みやすくシンプルに</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-sales-2', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>次のステップを明記すると、先方も動きやすくなります。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📊</span>
+              <span class="card-title">月次営業レポートの要約文作成</span>
+              <span class="card-scene">社内報告</span>
+            </div>
+            <div class="card-prompt" id="tpl-sales-3">以下の数字・情報をもとに、上司向けの月次営業サマリーを作成してください。
+
+■ 対象月：<span class="placeholder">【〇月】</span>
+■ 売上実績：<span class="placeholder">【金額または前月比】</span>
+■ 受注件数：<span class="placeholder">【件数】</span>
+■ 注力した取り組み：<span class="placeholder">【例：新規開拓3社訪問、既存顧客フォロー強化など】</span>
+■ 課題・来月の方針：<span class="placeholder">【例：クロージング率が低い→対策など】</span>
+
+条件：
+- 箇条書き＋短い説明文の形式で
+- 全体を300文字以内にまとめる</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-sales-3', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>数字を具体的に入れるほど、説得力のある報告になります。</div>
+          </div>
+        </section>
+
+        <!-- ── 情シス ── -->
+        <section id="it">
+          <div class="section-label">💻 情シス</div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📣</span>
+              <span class="card-title">社内システムのお知らせ文作成</span>
+              <span class="card-scene">社内連絡</span>
+            </div>
+            <div class="card-prompt" id="tpl-it-1">社内向けのシステムメンテナンス・変更のお知らせ文を作成してください。
+
+■ 対象システム：<span class="placeholder">【例：社内グループウェア、勤怠システムなど】</span>
+■ 作業内容：<span class="placeholder">【例：バージョンアップ、障害対応、新機能追加など】</span>
+■ 作業日時：<span class="placeholder">【〇月〇日（〇）〇:〇〇〜〇:〇〇】</span>
+■ 利用者への影響：<span class="placeholder">【例：その時間帯はログイン不可、一部機能が使えない等】</span>
+■ 問い合わせ先：<span class="placeholder">【部署名・連絡先】</span>
+
+条件：
+- 非IT部門の社員にもわかりやすく
+- 短く、箇条書きを活用して読みやすく</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-it-1', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「利用者への影響」を明確に書くと問い合わせが減ります。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">🔐</span>
+              <span class="card-title">セキュリティ注意喚起メール</span>
+              <span class="card-scene">社内連絡</span>
+            </div>
+            <div class="card-prompt" id="tpl-it-2">全社員向けのセキュリティ注意喚起メールを作成してください。
+
+■ 注意喚起の内容：<span class="placeholder">【例：フィッシングメールの増加、パスワード使い回しのリスク、不審なUSBの取り扱いなど】</span>
+■ 具体的な対応策：<span class="placeholder">【例：不審なメールのリンクをクリックしない、ITへ報告するなど】</span>
+■ 緊急度：<span class="placeholder">【高・中・低】</span>
+
+条件：
+- 脅かしすぎず、でも真剣さが伝わる文体で
+- 具体的な行動が明確になるように
+- 300文字以内でわかりやすく</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-it-2', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「具体的な対応策」を1〜2個に絞ると行動につながりやすいです。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">🛠️</span>
+              <span class="card-title">FAQ・マニュアル文章の改善</span>
+              <span class="card-scene">ドキュメント</span>
+            </div>
+            <div class="card-prompt" id="tpl-it-3">以下のマニュアルや説明文を、初心者にもわかりやすく書き直してください。
+
+■ 対象文章：
+<span class="placeholder">【ここに既存のマニュアル文章を貼り付けてください】</span>
+
+■ 読み手：<span class="placeholder">【例：IT知識のない一般社員、新入社員など】</span>
+
+条件：
+- 専門用語はわかりやすい言葉に置き換える
+- 手順は番号付きの箇条書きで
+- できるだけ短く、1ステップ1アクションで書く</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-it-3', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>既存のマニュアルをそのまま貼るだけでOK！一気に読みやすくなります。</div>
+          </div>
+        </section>
+
+        <!-- ── 経理 ── -->
+        <section id="accounting">
+          <div class="section-label">🧾 経理</div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📧</span>
+              <span class="card-title">請求書の確認依頼メール</span>
+              <span class="card-scene">社内・社外</span>
+            </div>
+            <div class="card-prompt" id="tpl-acc-1">請求書の内容確認をお願いするメールを作成してください。
+
+■ 宛先：<span class="placeholder">【担当者名・部署名】</span>
+■ 請求書の発行元：<span class="placeholder">【会社名】</span>
+■ 金額：<span class="placeholder">【金額】</span>
+■ 確認してほしい内容：<span class="placeholder">【例：勘定科目の確認、承認、修正依頼など】</span>
+■ 対応期限：<span class="placeholder">【〇月〇日まで】</span>
+
+条件：
+- 丁寧で簡潔なビジネスメール
+- 相手が何をすれば良いか明確に</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-acc-1', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>期限と「何をお願いするか」を明確にすると返信が早くなります。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📝</span>
+              <span class="card-title">経費精算の注意喚起文作成</span>
+              <span class="card-scene">社内連絡</span>
+            </div>
+            <div class="card-prompt" id="tpl-acc-2">社員向けに経費精算のルールや注意事項を周知する案内文を作成してください。
+
+■ 周知内容：<span class="placeholder">【例：月末締め期限の案内、領収書の電子添付義務化、上限金額の変更など】</span>
+■ 対応期限・スケジュール：<span class="placeholder">【例：〇月〇日までに提出など】</span>
+■ 問い合わせ先：<span class="placeholder">【経理部〇〇、内線〇〇など】</span>
+
+条件：
+- 非経理部門の社員にも伝わりやすく
+- 箇条書きを使って読みやすく
+- 柔らかいトーンで</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-acc-2', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「変更点」は太字や箇条書きで目立たせると認知されやすいです。</div>
+          </div>
+        </section>
+
+        <!-- ── 人事・給与・採用 ── -->
+        <section id="hr-general">
+          <div class="section-label">👥 人事・給与・採用</div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">💌</span>
+              <span class="card-title">求人票の作成補助</span>
+              <span class="card-scene">採用</span>
+            </div>
+            <div class="card-prompt" id="tpl-hr-1">以下の情報をもとに、魅力的な求人票の文章を作成してください。
+
+■ 職種：<span class="placeholder">【例：営業事務、ITエンジニア、経理スタッフなど】</span>
+■ 仕事内容：<span class="placeholder">【具体的な業務内容を箇条書きで】</span>
+■ 必須スキル・経験：<span class="placeholder">【例：Excel基礎、〇〇業務経験1年以上など】</span>
+■ 歓迎スキル：<span class="placeholder">【あれば嬉しいスキルや経験】</span>
+■ 職場の雰囲気・特徴：<span class="placeholder">【例：チームワーク重視、残業少なめ、研修充実など】</span>
+
+条件：
+- 応募したいと思えるポジティブな表現で
+- 仕事のやりがいや職場の良さが伝わるように
+- 400文字程度でまとめてください</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-hr-1', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「職場の雰囲気」を具体的に書くと、ミスマッチが減ります。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">🎉</span>
+              <span class="card-title">内定通知メールの下書き</span>
+              <span class="card-scene">採用</span>
+            </div>
+            <div class="card-prompt" id="tpl-hr-2">内定通知のメール文章を作成してください。
+
+■ 宛先（候補者名）：<span class="placeholder">【〇〇様】</span>
+■ 選考結果：内定
+■ 入社予定日：<span class="placeholder">【〇月〇日】</span>
+■ 次のステップ：<span class="placeholder">【例：内定承諾書の提出期限、入社前説明会の案内など】</span>
+
+条件：
+- 温かみのある、丁寧な文体で
+- 候補者が安心・喜べるような表現で
+- 次のアクションが明確になるように</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-hr-2', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>最初の印象が大切！温かいメッセージが入社モチベーションにつながります。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📋</span>
+              <span class="card-title">給与明細・手当変更の案内文</span>
+              <span class="card-scene">給与</span>
+            </div>
+            <div class="card-prompt" id="tpl-hr-3">給与・手当の変更について社員に周知する案内文を作成してください。
+
+■ 変更内容：<span class="placeholder">【例：通勤手当の上限変更、住宅手当の新設、昇給の反映など】</span>
+■ 適用開始月：<span class="placeholder">【〇月分より】</span>
+■ 問い合わせ先：<span class="placeholder">【人事部〇〇、内線〇〇など】</span>
+
+条件：
+- 正確で簡潔な文体で
+- 社員が変更点を正しく理解できるように
+- 難しい言葉は避けてわかりやすく</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-hr-3', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「いつから」「何が」「どう変わる」の3点を明確にするのがコツです。</div>
+          </div>
+        </section>
+
+        <!-- ── 研修 ── -->
+        <section id="training">
+          <div class="section-label">📚 研修</div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">🗓️</span>
+              <span class="card-title">研修案内メールの作成</span>
+              <span class="card-scene">社内連絡</span>
+            </div>
+            <div class="card-prompt" id="tpl-tr-1">社内研修の参加案内メールを作成してください。
+
+■ 研修名：<span class="placeholder">【例：新入社員ビジネスマナー研修、Excel実践講座など】</span>
+■ 対象者：<span class="placeholder">【例：〇年目以上の全社員、営業部メンバーなど】</span>
+■ 日時：<span class="placeholder">【〇月〇日（〇）〇:〇〇〜〇:〇〇】</span>
+■ 場所・形式：<span class="placeholder">【例：本社3F会議室 / オンライン（ZoomURL別途送付）】</span>
+■ 申込期限：<span class="placeholder">【〇月〇日まで】</span>
+■ 申込方法：<span class="placeholder">【例：〇〇フォームから申込、返信メールで参加表明など】</span>
+
+条件：
+- 参加意欲が高まるような表現で
+- 必要事項が一目でわかるように</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-tr-1', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>「研修で何が身につくか」を一言添えると参加率が上がります。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">💬</span>
+              <span class="card-title">研修後アンケートのフィードバック要約</span>
+              <span class="card-scene">研修企画</span>
+            </div>
+            <div class="card-prompt" id="tpl-tr-2">以下のアンケート回答をもとに、研修のフィードバックサマリーを作成してください。
+
+■ アンケート回答（自由記述）：
+<span class="placeholder">【ここにアンケートの回答を貼り付けてください】</span>
+
+条件：
+- 良かった点・改善点に分けて整理する
+- 次回の研修改善に活かせるよう具体的にまとめる
+- 全体を400文字以内でまとめてください</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-tr-2', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>アンケートをそのまま貼るだけ！要点整理を自動でやってくれます。</div>
+          </div>
+        </section>
+
+        <!-- ── 購買 ── -->
+        <section id="purchase">
+          <div class="section-label">📦 購買</div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📩</span>
+              <span class="card-title">見積依頼メールの作成</span>
+              <span class="card-scene">社外メール</span>
+            </div>
+            <div class="card-prompt" id="tpl-pur-1">取引先への見積依頼メールを作成してください。
+
+■ 宛先：<span class="placeholder">【取引先名・担当者名】</span>
+■ 依頼内容（品目・数量・仕様など）：<span class="placeholder">【例：〇〇品 100個、仕様は〇〇の通り】</span>
+■ 納期希望：<span class="placeholder">【〇月〇日まで】</span>
+■ 見積回答期限：<span class="placeholder">【〇月〇日まで】</span>
+■ 特記事項：<span class="placeholder">【例：梱包条件、納入場所など】</span>
+
+条件：
+- 丁寧で簡潔なビジネスメール
+- 相手が迷わず対応できるよう明確に</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-pur-1', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>仕様や数量を具体的に書くほど、的確な見積が返ってきます。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">⚖️</span>
+              <span class="card-title">複数見積の比較検討コメント作成</span>
+              <span class="card-scene">社内報告</span>
+            </div>
+            <div class="card-prompt" id="tpl-pur-2">以下の複数社の見積情報をもとに、比較検討コメントを作成してください。
+
+■ 品目：<span class="placeholder">【調達品目】</span>
+
+■ 各社の見積情報：
+　・A社：<span class="placeholder">【金額・納期・条件など】</span>
+　・B社：<span class="placeholder">【金額・納期・条件など】</span>
+　・C社：<span class="placeholder">【金額・納期・条件など】</span>（任意）
+
+■ 重視するポイント：<span class="placeholder">【例：価格重視、納期優先、品質重視など】</span>
+
+条件：
+- 比較表形式＋推奨理由のコメントで
+- 上司への報告書として使える形式で</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-pur-2', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>情報を貼るだけで比較検討コメントが完成！稟議書作成が楽になります。</div>
+          </div>
+        </section>
+
+        <!-- ── 総務 ── -->
+        <section id="general-affairs">
+          <div class="section-label">🏢 総務</div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📢</span>
+              <span class="card-title">社内行事・イベントの案内文</span>
+              <span class="card-scene">社内連絡</span>
+            </div>
+            <div class="card-prompt" id="tpl-ga-1">社内行事・イベントの案内文を作成してください。
+
+■ イベント名：<span class="placeholder">【例：社内懇親会、防災訓練、健康診断のお知らせなど】</span>
+■ 日時：<span class="placeholder">【〇月〇日（〇）〇:〇〇〜】</span>
+■ 場所：<span class="placeholder">【〇〇会議室、社員食堂など】</span>
+■ 対象者：<span class="placeholder">【全社員 / 〇部門のみ など】</span>
+■ 参加方法・締切：<span class="placeholder">【例：〇日までにフォームから申込など】</span>
+■ その他補足：<span class="placeholder">【例：服装、持ち物、費用など】</span>
+
+条件：
+- 明るく参加意欲が高まるトーンで
+- 必要情報がひと目でわかるよう整理して</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-ga-1', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>懇親会なら「楽しみましょう！」の一言が参加率を上げます🎉</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">🏠</span>
+              <span class="card-title">テレワーク・働き方ルール変更の周知文</span>
+              <span class="card-scene">社内連絡</span>
+            </div>
+            <div class="card-prompt" id="tpl-ga-2">テレワーク・働き方に関するルール変更を全社員に周知する文章を作成してください。
+
+■ 変更内容：<span class="placeholder">【例：テレワーク日数の上限変更、コアタイムの見直しなど】</span>
+■ 適用開始日：<span class="placeholder">【〇月〇日から】</span>
+■ 変更理由：<span class="placeholder">【任意：例：法改正対応、生産性向上のためなど】</span>
+■ 問い合わせ先：<span class="placeholder">【総務部〇〇、内線〇〇】</span>
+
+条件：
+- 社員が受け入れやすい丁寧な文体で
+- 「いつから」「何が」「どう変わるか」を明確に</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-ga-2', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>変更理由も添えると、社員の納得感が高まります。</div>
+          </div>
+        </section>
+
+        <!-- ── 法務 ── -->
+        <section id="legal">
+          <div class="section-label">⚖️ 法務</div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">📜</span>
+              <span class="card-title">契約書の要点整理（読み解きサポート）</span>
+              <span class="card-scene">契約確認</span>
+            </div>
+            <div class="card-prompt" id="tpl-leg-1">以下の契約書または条項について、要点をわかりやすく整理してください。
+
+■ 契約書の種類：<span class="placeholder">【例：業務委託契約、秘密保持契約（NDA）、売買契約など】</span>
+■ 確認したい箇所・条文：
+<span class="placeholder">【ここに契約書の条文テキストを貼り付けてください】</span>
+
+条件：
+- 法律の専門知識がない担当者でも理解できるよう
+- ポイントを箇条書きで整理する
+- 「注意すべき点」や「確認が必要な箇所」があれば指摘してください
+- ※ AIの回答は参考情報です。最終判断は必ず専門家（弁護士等）に確認してください</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-leg-1', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>専門家確認前の「下読み」として使うと、確認の質が上がります。</div>
+          </div>
+
+          <div class="template-card">
+            <div class="card-header">
+              <span class="card-icon">✅</span>
+              <span class="card-title">社内規程の改定案チェック</span>
+              <span class="card-scene">規程管理</span>
+            </div>
+            <div class="card-prompt" id="tpl-leg-2">以下の社内規程の文章について、わかりにくい表現・矛盾・改善点を指摘してください。
+
+■ 規程名：<span class="placeholder">【例：就業規則、情報セキュリティポリシーなど】</span>
+■ 対象文章：
+<span class="placeholder">【ここに規程の文章を貼り付けてください】</span>
+
+条件：
+- 一般社員にも理解しやすいか確認
+- 曖昧な表現・解釈が割れそうな箇所を指摘
+- 修正案があれば提案してください
+- ※ 最終確認は必ず担当者・専門家が行ってください</div>
+            <button class="copy-btn" onclick="copyTemplate('tpl-leg-2', this)">📋 コピー</button>
+            <div class="card-tip"><span>💡 ポイント：</span>既存の文章を貼るだけで「わかりにくい点」を洗い出してくれます。</div>
+          </div>
+        </section>
+
+        <!-- ── 注意事項 ── -->
+        <section id="caution">
+          <h2>⚠️ テンプレートを使う際の注意事項</h2>
+          <div class="caution-box">
+            <div class="caution-title">⚠️ 必ずご確認ください</div>
+            <ul class="emoji-list">
+              <li data-emoji="●">氏名・住所・電話番号・マイナンバーなどの<strong>個人情報は絶対に入力しない</strong></li>
+              <li data-emoji="●">社外秘・機密情報（売上数値・製品仕様・人事情報など）は入力しない</li>
+              <li data-emoji="●">AIの回答は誤りを含む場合があります。<strong>必ず人間が内容を確認</strong>してから使用してください</li>
+              <li data-emoji="●">法務・医療・税務など専門判断が必要な内容は、必ず専門家に最終確認を</li>
+              <li data-emoji="●">無償版には1日あたりの利用回数制限があります。重要な作業から優先して活用しましょう</li>
+            </ul>
+          </div>
+          <div class="hint-box" style="margin-top:14px;">
+            <div class="hint-title">💡 もっと上手に使うコツ</div>
+            <ul class="emoji-list">
+              <li data-emoji="🌟">回答がイメージと違ったら「もう少し丁寧にして」「箇条書きにして」など<strong>追加指示</strong>を送ろう</li>
+              <li data-emoji="🌟">「〇〇の立場で考えてください」と役割を指定すると、より的確な回答が得られます</li>
+              <li data-emoji="🌟">一度で完璧にしようとせず、<strong>会話しながら改善</strong>していくのがコツ！</li>
+            </ul>
+          </div>
+        </section>
+
+        <div class="footer">
+          <span class="copyright-pill"><strong>Powered by Oz</strong></span>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<script>
+function copyTemplate(id, btn) {
+  const el = document.getElementById(id);
+  // プレースホルダーのspanを含むテキストを取得
+  let text = '';
+  el.childNodes.forEach(node => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      text += node.textContent;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      text += node.textContent;
+    }
+  });
+  navigator.clipboard.writeText(text.trim()).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ コピーしました！';
+    btn.style.background = 'linear-gradient(135deg,#d1fae5,#34d399,#059669)';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+    }, 2000);
+  }).catch(() => {
+    // フォールバック
+    const range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    btn.textContent = '✅ コピーしました！';
+    setTimeout(() => { btn.textContent = '📋 コピー'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
